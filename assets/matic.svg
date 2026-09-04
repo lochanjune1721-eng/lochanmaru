@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Matic">
+  <rect width="200" height="200" fill="#f1f0ee"/>
+  <path fill="#202124" fill-rule="evenodd" d="
+    M 42 150
+    L 42 97
+    C 42 68, 61 55, 78 55
+    C 89 55, 96 61, 100 69
+    C 104 61, 111 55, 122 55
+    C 139 55, 158 68, 158 97
+    L 158 150
+    L 131 150
+    L 131 99
+    C 131 87, 128 82, 122 82
+    C 116 82, 112 87, 112 99
+    L 112 150
+    L 88 150
+    L 88 99
+    C 88 87, 84 82, 78 82
+    C 72 82, 69 87, 69 99
+    L 69 150
+    Z"/>
+</svg>

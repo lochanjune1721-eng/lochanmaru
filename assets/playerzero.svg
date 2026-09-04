@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="PlayerZero">
+  <rect width="200" height="200" fill="#ffffff"/>
+  <g fill="#111111">
+    <rect x="70" y="36" width="20" height="20" rx="2"/>
+    <rect x="90" y="36" width="20" height="20" rx="2"/>
+    <rect x="70" y="56" width="20" height="20" rx="2"/>
+    <rect x="90" y="56" width="20" height="20" rx="2"/>
+    <rect x="110" y="56" width="20" height="20" rx="2"/>
+    <rect x="90" y="76" width="20" height="20" rx="2"/>
+    <rect x="110" y="76" width="20" height="20" rx="2"/>
+  </g>
+  <text x="100" y="144" textLength="162" lengthAdjust="spacingAndGlyphs"
+        font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="26" font-weight="400"
+        fill="#111111" text-anchor="middle">PLAYERZERO</text>
+</svg>

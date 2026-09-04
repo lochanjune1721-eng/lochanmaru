@@ -481,6 +481,71 @@ document.addEventListener('DOMContentLoaded', function () {
                 'https://www.instagram.com/p/DQMcbqik1QX/embed'
             ]
         },
+        'matic': {
+            name: 'Matic',
+            image: 'assets/matic.svg',
+            growth: '10M+ Views',
+            role: 'Launch Copy & Distribution',
+            description: `<p><strong>Brief:</strong> Launch AI-powered humanoid robots to an audience that doesn't follow robotics</p><p>The hard part of this launch was never the technology. It was making physical-world autonomy legible - a robot that operates in real, messy spaces rather than a demo rig on a stage.</p><p>So the copy led with what the robot actually does in a home, and let the autonomy claim be the conclusion the reader arrives at, not the opening line. Spec-first framing would have narrowed the audience to people who were already convinced.</p><p>The launch copy was then paired with a set of influencer distribution posts written to travel independently of the announcement itself. Together they drove <strong>10M+ views</strong>.</p>`,
+            metrics: [
+                '10M+ views across launch and distribution',
+                'Launch copy for AI-powered humanoid robots',
+                'Positioned physical-world autonomy for a mainstream audience'
+            ],
+            tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/maticrobots/status/2087962897267990915"></a></blockquote>`
+        },
+        'fishaudio': {
+            name: 'Fish Audio',
+            image: 'assets/fishaudio.svg',
+            growth: '5M+ Impressions',
+            role: 'Launch Copy & Distribution',
+            description: `<p><strong>Brief:</strong> Launch the S2 voice model</p><p>Voice model launches usually collapse into benchmark talk. The interesting thing about S2 wasn't a number - it was that the voice was both expressive and controllable, which are usually a tradeoff.</p><p>I built the launch copy around that tension: you can direct the performance, not just generate audio. That gave the announcement a claim people could actually hear the difference in.</p><p>Influencer distribution posts carried the same idea outward and generated <strong>5M+ impressions</strong>.</p>`,
+            metrics: [
+                '5M+ impressions from distribution posts',
+                'Launch copy for the S2 voice model',
+                'Framed expressive + controllable voice generation as one claim'
+            ],
+            tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/FishAudio/status/2082152596739862853"></a></blockquote>`
+        },
+        'playerzero': {
+            name: 'PlayerZero',
+            image: 'assets/playerzero.svg',
+            growth: '2.7M+ Impressions',
+            role: 'Launch Copy',
+            description: `<p><strong>Brief:</strong> Position AI-powered software testing</p><p>"AI for testing" is a crowded, low-signal category. Every tool in it says the same thing.</p><p>The sharper story was what PlayerZero does with the tests: it autonomously finds critical production issues - the bugs that are already costing you, not hypothetical coverage gaps.</p><p>Writing the launch around found production issues rather than testing capability gave the product a concrete, checkable promise. The launch generated <strong>2.7M+ impressions</strong>.</p>`,
+            metrics: [
+                '2.7M+ impressions',
+                'Launch copy for AI-powered software testing',
+                'Positioned around autonomously finding critical production issues'
+            ],
+            tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/akoratana/status/2036111467016319074"></a></blockquote>`
+        },
+        'polyai': {
+            name: 'PolyAI',
+            image: 'assets/polyai.svg',
+            growth: '3.4M+ Impressions',
+            role: 'Launch Copy',
+            description: `<p><strong>Brief:</strong> Turn complex enterprise voice AI into something people can repeat</p><p>Enterprise voice AI is a category that explains itself badly. The buyer understands it; nobody else does, so the story stops at the buyer.</p><p>I cut the launch copy down to one clear idea: AI agents handling real customer conversations - not IVR trees, not deflection, actual conversations that resolve.</p><p>Keeping the claim concrete let a technical enterprise product travel on a consumer-shaped feed. It generated <strong>3.4M+ impressions</strong>.</p>`,
+            metrics: [
+                '3.4M+ impressions',
+                'Launch copy for enterprise voice AI',
+                'Reframed the product around AI agents handling real customer conversations'
+            ],
+            tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/polyaivoice/status/2023789465509015972"></a></blockquote>`
+        },
+        'wisprflow': {
+            name: 'Wispr Flow',
+            image: 'assets/wisprflow.svg',
+            growth: 'Launch Campaign',
+            role: 'Launch Copy',
+            description: `<p><strong>Brief:</strong> Launch copy for Wispr Flow</p><p>Wispr Flow turns speech into written text anywhere you already type. The temptation with a product like this is to sell the speech model; the actual shift is behavioural - dictation stops being a fallback and becomes the default way you write.</p><p>The launch copy stayed on that behavioural change rather than the underlying models, and ran from the founder's account.</p>`,
+            metrics: [
+                'Launch copy for the Wispr Flow launch',
+                'Founder-led launch post',
+                'Positioned voice as a default input, not an accessibility fallback'
+            ],
+            tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/tankots/status/2025981424470479008"></a></blockquote>`
+        },
         'personal': {
             name: 'June & Lochan',
             image: 'assets/june.png',
@@ -624,6 +689,17 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
         `;
 
+        if (data.tweet) {
+            html += `
+                <div class="modal-section">
+                    <h3>Launch Post</h3>
+                    <div style="display: flex; justify-content: center; width: 100%;">
+                        ${data.tweet}
+                    </div>
+                </div>
+            `;
+        }
+
         if (data.videos && data.videos.length > 0) {
             html += `
                 <div class="modal-section">
@@ -647,6 +723,11 @@ document.addEventListener('DOMContentLoaded', function () {
             projectModalBody.innerHTML = content;
             projectModal.classList.add('active');
             document.body.style.overflow = 'hidden';
+
+            // Reload Twitter widgets if present
+            if (window.twttr) {
+                window.twttr.widgets.load();
+            }
         });
     });
 

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="PolyAI">
+  <rect width="200" height="200" fill="#282828"/>
+  <g fill="#c9f24d">
+    <circle cx="100.0" cy="72.0" r="6"/>
+    <circle cx="100.0" cy="55.0" r="6"/>
+    <circle cx="85.3" cy="63.5" r="6"/>
+    <circle cx="85.3" cy="80.5" r="6"/>
+    <circle cx="100.0" cy="89.0" r="6"/>
+    <circle cx="114.7" cy="80.5" r="6"/>
+    <circle cx="114.7" cy="63.5" r="6"/>
+    <circle cx="116.0" cy="44.3" r="6"/>
+    <circle cx="84.0" cy="44.3" r="6"/>
+    <circle cx="68.0" cy="72.0" r="6"/>
+    <circle cx="84.0" cy="99.7" r="6"/>
+    <circle cx="116.0" cy="99.7" r="6"/>
+    <circle cx="132.0" cy="72.0" r="6"/>
+  </g>
+  <text x="100" y="156" textLength="106" lengthAdjust="spacingAndGlyphs"
+        font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="34" font-weight="500"
+        fill="#ffffff" text-anchor="middle">PolyAI</text>
+</svg>
