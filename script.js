@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const journeyData = {
         'saasflash': {
             title: 'SaasFlash - Creative Director',
-            subtitle: 'Leading Teams & Scaling Brands',
+            subtitle: '2025 · Leading Teams & Scaling Brands',
             description: `<p><strong>Starting point:</strong> ~30,000 followers<br><strong>Ambition:</strong> Become the most premium tech content agency, not just another growth page</p><p>When I joined SaaSFlash, the page was already “good.” Editing quality was high, topics were relevant, and the team clearly cared about the product. But that was also the problem - it looked like every other good tech page.</p><p>What was missing was point of view.</p><p>The founders didn’t want SaaSFlash to be a meme page or a repurposing machine. They wanted clients to look at the page and think: “These people actually understand tech at a deep level.”</p><p>So my role naturally became less about volume and more about raising the intellectual ceiling of the content. I went deep into tech discourse: SaaS, startups, AI, infra, founders, distribution. Instead of summarizing news, I focused on:</p><ul><li>Why a trend exists</li><li>What people are misunderstanding</li><li>What this says about where tech is headed</li></ul><p>Every trending topic had to earn its place. If we covered it, it needed a clear POV, not just information. I wrote nuanced scripts that assumed the audience was smart and curious, not passive.</p><p>Several of the videos I wrote became the most viral pieces on the page, but more importantly, they shaped SaaSFlash’s identity. The page started feeling premium, opinionated, and thoughtful.</p><p>That positioning paid off beyond views. Clients started coming in because of the page itself. SaaSFlash closed 5–6 high-quality clients using the content as proof that they weren’t just editors - they were thinkers.</p>`,
             tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/shiri_shh/status/2007137787359965423"></a></blockquote>`,
             videos: [
@@ -186,9 +186,9 @@ document.addEventListener('DOMContentLoaded', function () {
             ]
         },
         'ailaunches': {
-            title: 'AI Product Launches',
-            subtitle: 'Launch Copywriter · 2025 - Present',
-            description: `<p>Launch copy for frontier AI companies - the day-one narrative that decides whether a hard technical product lands with anyone outside its own category.</p><p>The work is the same each time: find the one claim a non-expert can repeat, cut everything that only makes sense to the buyer, and pair the announcement with distribution written to travel on its own. Across five launches that added up to <strong>20M+ views and impressions</strong>.</p>`,
+            title: 'Social Capital',
+            subtitle: 'AI Launch Copywriter · Present',
+            description: `<p>At Social Capital I write launch copy for frontier AI companies - the day-one narrative that decides whether a hard technical product lands with anyone outside its own category.</p><p>The work is the same each time: find the one claim a non-expert can repeat, cut everything that only makes sense to the buyer, and pair the announcement with distribution written to travel on its own. Across five launches that added up to <strong>20M+ views and impressions</strong>.</p>`,
             projects: [
                 {
                     name: 'Matic',

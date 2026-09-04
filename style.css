@@ -1746,9 +1746,13 @@ ul {
     white-space: nowrap;
 }
 
-/* Left-hand timeline cards are right-aligned; keep the list readable */
-.timeline-item.left .timeline-list li {
-    flex-direction: row-reverse;
+/* The card may be right-aligned, but the list always reads name-then-metric */
+.timeline-item .timeline-list li {
+    text-align: left;
+}
+
+.timeline-item .timeline-list .tl-metric {
+    text-align: right;
 }
 
 /* ============================================
@@ -1925,6 +1929,14 @@ ul {
 }
 
 @media (max-width: 768px) {
+    /* The mobile reset on .timeline-item loses to the two-class desktop
+       .timeline-item.left rule, so restate the alignment at equal specificity.
+       Without this every left-side card reads right-aligned on a phone. */
+    .timeline-item.left,
+    .timeline-item.right {
+        text-align: left;
+    }
+
     .nf-row-block {
         margin-bottom: 3rem;
     }
@@ -1941,9 +1953,5 @@ ul {
 
     .nf-card:active {
         transform: scale(0.97);
-    }
-
-    .timeline-item.left .timeline-list li {
-        flex-direction: row;
     }
 }
