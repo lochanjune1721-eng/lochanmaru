@@ -185,6 +185,38 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             ]
         },
+        'ailaunches': {
+            title: 'AI Product Launches',
+            subtitle: 'Launch Copywriter · 2025 - Present',
+            description: `<p>Launch copy for frontier AI companies - the day-one narrative that decides whether a hard technical product lands with anyone outside its own category.</p><p>The work is the same each time: find the one claim a non-expert can repeat, cut everything that only makes sense to the buyer, and pair the announcement with distribution written to travel on its own. Across five launches that added up to <strong>20M+ views and impressions</strong>.</p>`,
+            projects: [
+                {
+                    name: 'Matic',
+                    growth: '10M+ views',
+                    description: `<p><strong>AI-powered humanoid robots and physical-world autonomy.</strong></p><p>Wrote the launch around what the robot actually does in a home rather than its specs, then paired it with influencer distribution posts built to travel.</p><p><a href="https://x.com/maticrobots/status/2087962897267990915" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">View the launch post &rarr;</a></p>`
+                },
+                {
+                    name: 'Fish Audio',
+                    growth: '5M+ impressions',
+                    description: `<p><strong>The S2 voice model.</strong></p><p>Built the copy around the tension the model resolves - voice that is expressive <em>and</em> controllable, usually a tradeoff - so the announcement had a claim you could hear.</p><p><a href="https://x.com/FishAudio/status/2082152596739862853" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">View the launch post &rarr;</a></p>`
+                },
+                {
+                    name: 'PolyAI',
+                    growth: '3.4M+ impressions',
+                    description: `<p><strong>Enterprise voice AI.</strong></p><p>Cut a dense enterprise product down to one repeatable idea: AI agents handling real customer conversations. Not IVR trees, not deflection.</p><p><a href="https://x.com/polyaivoice/status/2023789465509015972" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">View the launch post &rarr;</a></p>`
+                },
+                {
+                    name: 'PlayerZero',
+                    growth: '2.7M+ impressions',
+                    description: `<p><strong>AI-powered software testing.</strong></p><p>Positioned it on what it finds rather than what it tests - autonomously surfacing critical production issues - which gave a crowded category a checkable promise.</p><p><a href="https://x.com/akoratana/status/2036111467016319074" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">View the launch post &rarr;</a></p>`
+                },
+                {
+                    name: 'Wispr Flow',
+                    growth: 'Launch campaign',
+                    description: `<p><strong>Voice-driven writing.</strong></p><p>Kept the copy on the behavioural shift - dictation as the default way you write, not a fallback - rather than on the speech models underneath.</p><p><a href="https://x.com/tankots/status/2025981424470479008" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">View the launch post &rarr;</a></p>`
+                }
+            ]
+        },
         'juneandlochan': {
             title: 'June & Lochan',
             subtitle: 'Creator & Builder',
@@ -405,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ============================================
     // PROJECT SECTION - PROJECT CARDS
     // ============================================
-    const projectCards = document.querySelectorAll('.project-card');
+    const projectCards = document.querySelectorAll('.project-card, .nf-card');
     const projectModal = document.getElementById('project-modal');
     const projectModalBody = document.getElementById('project-modal-body');
     const projectModalClose = document.getElementById('project-modal-close');
@@ -742,6 +774,41 @@ document.addEventListener('DOMContentLoaded', function () {
             projectModal.classList.remove('active');
             document.body.style.overflow = 'auto';
         }
+    });
+
+    // ============================================
+    // NETFLIX ROW - ARROW SCROLLING
+    // ============================================
+    document.querySelectorAll('.nf-row-viewport').forEach(viewport => {
+        const row = viewport.querySelector('.nf-row');
+        const prev = viewport.querySelector('.nf-arrow-prev');
+        const next = viewport.querySelector('.nf-arrow-next');
+        if (!row || !prev || !next) return;
+
+        // Scroll by whatever is actually on screen, minus a sliver for context
+        const step = () => Math.max(row.clientWidth - 80, 200);
+
+        const syncArrows = () => {
+            const max = row.scrollWidth - row.clientWidth;
+            prev.disabled = row.scrollLeft < 8;
+            next.disabled = row.scrollLeft > max - 8;
+        };
+
+        prev.addEventListener('click', () => row.scrollBy({ left: -step(), behavior: 'smooth' }));
+        next.addEventListener('click', () => row.scrollBy({ left: step(), behavior: 'smooth' }));
+        row.addEventListener('scroll', syncArrows, { passive: true });
+        window.addEventListener('resize', syncArrows);
+        syncArrows();
+    });
+
+    // Keyboard access for the Netflix tiles
+    document.querySelectorAll('.nf-card').forEach(card => {
+        card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                card.click();
+            }
+        });
     });
 
     // ============================================
