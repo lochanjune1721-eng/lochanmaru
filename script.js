@@ -187,33 +187,33 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         'ailaunches': {
             title: 'Social Capital',
-            subtitle: 'AI Launch Copywriter · Present',
-            description: `<p>At Social Capital I write launch copy for frontier AI companies - the day-one narrative that decides whether a hard technical product lands with anyone outside its own category.</p><p>The work is the same each time: find the one claim a non-expert can repeat, cut everything that only makes sense to the buyer, and pair the announcement with distribution written to travel on its own. Across five launches that added up to <strong>20M+ views and impressions</strong>.</p>`,
+            subtitle: 'AI Launch Expert · Present',
+            description: `<p><strong>I run AI launches end to end.</strong> Not the deck, not the strategy doc - the actual distribution that decides whether a product lands.</p><p>Most launches die because a great product ships into the wrong feeds. So for every launch I do four things myself:</p><ul><li><strong>Cast the creators.</strong> I go through the space and find the accounts whose audience genuinely overlaps with the product. Not the biggest ones - the right ones. A 40K account with the exact audience beats a 2M account with the wrong one, every time.</li><li><strong>Run every one of them.</strong> I text them, DM them, get them on the call, close them, and manage the relationship all the way through to publish. Nobody gets handed off.</li><li><strong>Write the post they publish.</strong> Creators shouldn't be guessing at the angle. I hand each one the exact post - the hook, the framing, the line that travels - built for their audience, not the brand's.</li><li><strong>Push it until it goes viral.</strong> Sequencing, timing, who posts first, who amplifies second. A launch is a wave, not a day.</li></ul><p>Five launches run this way: <strong>25M+ views and impressions</strong>.</p>`,
             projects: [
                 {
                     name: 'Matic',
                     growth: '10M+ views',
-                    description: `<p><strong>AI-powered humanoid robots and physical-world autonomy.</strong></p><p>Wrote the launch around what the robot actually does in a home rather than its specs, then paired it with influencer distribution posts built to travel.</p><p><a href="https://x.com/maticrobots/status/2087962897267990915" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">View the launch post &rarr;</a></p>`
+                    description: `<p><strong>AI-powered humanoid robots</strong></p><p>Everyone in robotics posts spec sheets and lab demos - which is exactly why nobody outside robotics ever sees them.<br><br>So I didn't cast robotics accounts. I went after creators whose audiences are already emotionally invested in the home: gadget people, home-tech people, the ones whose comment sections argue about vacuums and cameras. Every post I wrote for them opened on the robot doing something in a real, messy room, and let “autonomy” be the conclusion the viewer reached on their own instead of the claim they were asked to believe.</p><p><a href="https://x.com/maticrobots/status/2087962897267990915" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">See the launch post &rarr;</a></p>`
                 },
                 {
                     name: 'Fish Audio',
                     growth: '5M+ impressions',
-                    description: `<p><strong>The S2 voice model.</strong></p><p>Built the copy around the tension the model resolves - voice that is expressive <em>and</em> controllable, usually a tradeoff - so the announcement had a claim you could hear.</p><p><a href="https://x.com/FishAudio/status/2082152596739862853" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">View the launch post &rarr;</a></p>`
+                    description: `<p><strong>The S2 voice model</strong></p><p>Voice model launches drown in benchmark numbers nobody can hear.<br><br>The thing actually worth showing about S2 is that it's expressive <em>and</em> controllable - normally a tradeoff. That only lands if someone demonstrates it out loud, so I cast AI-audio and voice creators who could put the model on screen and let people hear the difference, then wrote each post so the demo carried the claim instead of the caption.</p><p><a href="https://x.com/FishAudio/status/2082152596739862853" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">See the launch post &rarr;</a></p>`
                 },
                 {
                     name: 'PolyAI',
                     growth: '3.4M+ impressions',
-                    description: `<p><strong>Enterprise voice AI.</strong></p><p>Cut a dense enterprise product down to one repeatable idea: AI agents handling real customer conversations. Not IVR trees, not deflection.</p><p><a href="https://x.com/polyaivoice/status/2023789465509015972" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">View the launch post &rarr;</a></p>`
+                    description: `<p><strong>Enterprise voice AI</strong></p><p>Enterprise is the hardest launch there is: the buyer understands the product, nobody else does, and the story dies at the buyer.<br><br>I cast operators and business-AI accounts rather than consumer tech ones, and gave every single one of them the same repeatable line - AI agents handling real customer conversations. Not IVR trees. Not deflection. One sentence a non-buyer could repeat at a dinner table is what got an enterprise product onto a consumer-shaped feed.</p><p><a href="https://x.com/polyaivoice/status/2023789465509015972" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">See the launch post &rarr;</a></p>`
                 },
                 {
                     name: 'PlayerZero',
                     growth: '2.7M+ impressions',
-                    description: `<p><strong>AI-powered software testing.</strong></p><p>Positioned it on what it finds rather than what it tests - autonomously surfacing critical production issues - which gave a crowded category a checkable promise.</p><p><a href="https://x.com/akoratana/status/2036111467016319074" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">View the launch post &rarr;</a></p>`
+                    description: `<p><strong>AI-powered software testing</strong></p><p>“AI for testing” is a category where every product says the same sentence, and engineers have learned to scroll past it.<br><br>So I cast dev accounts whose audiences have actually been paged at 3am, and flipped the framing off what the product tests and onto what it finds: critical production issues, found autonomously. A promise you can check beats a capability you can't.</p><p><a href="https://x.com/akoratana/status/2036111467016319074" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">See the launch post &rarr;</a></p>`
                 },
                 {
                     name: 'Wispr Flow',
-                    growth: 'Launch campaign',
-                    description: `<p><strong>Voice-driven writing.</strong></p><p>Kept the copy on the behavioural shift - dictation as the default way you write, not a fallback - rather than on the speech models underneath.</p><p><a href="https://x.com/tankots/status/2025981424470479008" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">View the launch post &rarr;</a></p>`
+                    growth: '4M+ views',
+                    description: `<p><strong>Voice-driven writing</strong></p><p>This is the one launch where I deliberately did <em>not</em> spread the cast wide.<br><br>Wispr Flow asks you to change a habit - stop typing, start talking - and habit changes get sold by one person you already trust, not twenty you don't. So I built it founder-first: the anchor post came from the founder's own account, written around the moment the habit clicks rather than the speech model underneath it. Then I put the creator layer <em>behind</em> that post instead of in front of it, so every account I ran pointed back at the same story rather than competing with it. One story, amplified - <strong>4M+ views</strong>.</p><p><a href="https://x.com/tankots/status/2025981424470479008" target="_blank" rel="noopener" style="color: #e50914; text-decoration: none; font-weight: bold;">See the launch post &rarr;</a></p>`
                 }
             ]
         },
@@ -517,12 +517,13 @@ document.addEventListener('DOMContentLoaded', function () {
             name: 'Matic',
             image: 'assets/matic.svg',
             growth: '10M+ Views',
-            role: 'Launch Copy & Distribution',
-            description: `<p><strong>Brief:</strong> Launch AI-powered humanoid robots to an audience that doesn't follow robotics</p><p>The hard part of this launch was never the technology. It was making physical-world autonomy legible - a robot that operates in real, messy spaces rather than a demo rig on a stage.</p><p>So the copy led with what the robot actually does in a home, and let the autonomy claim be the conclusion the reader arrives at, not the opening line. Spec-first framing would have narrowed the audience to people who were already convinced.</p><p>The launch copy was then paired with a set of influencer distribution posts written to travel independently of the announcement itself. Together they drove <strong>10M+ views</strong>.</p>`,
+            role: 'Launch & Influencer Distribution',
+            description: `<p><strong>The product:</strong> AI-powered humanoid robots built for the physical world - a machine that actually works inside a real home, not a lab.</p><p><strong>The problem with launching it:</strong> robotics announcements are written by robotics people for robotics people. Spec sheets, lab demos, benchmark clips. It's the reason a genuinely wild product ends up seen by four thousand engineers and nobody else.</p><p><strong>What I did:</strong> I didn't cast a single robotics account. I went after creators whose audiences are already emotionally invested in the home - gadget reviewers, home-tech people, the accounts whose comment sections argue about vacuums and doorbell cameras. Those audiences don't need to be convinced a home robot matters; they've been waiting for one.</p><p>I ran every creator personally: found them, texted them, closed them, briefed them, held the publish window. Then I wrote the actual post each of them put out - every one opening on the robot doing something in a real, messy room, so “physical-world autonomy” became the conclusion the viewer reached instead of the claim they were asked to swallow.</p><p><strong>Result:</strong> 10M+ views.</p>`,
             metrics: [
-                '10M+ views across launch and distribution',
-                'Launch copy for AI-powered humanoid robots',
-                'Positioned physical-world autonomy for a mainstream audience'
+                '10M+ views across the launch',
+                'Cast and ran the full creator roster end to end',
+                'Wrote every post published',
+                'Took humanoid robotics to a mainstream feed'
             ],
             tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/maticrobots/status/2087962897267990915"></a></blockquote>`
         },
@@ -530,51 +531,55 @@ document.addEventListener('DOMContentLoaded', function () {
             name: 'Fish Audio',
             image: 'assets/fishaudio.svg',
             growth: '5M+ Impressions',
-            role: 'Launch Copy & Distribution',
-            description: `<p><strong>Brief:</strong> Launch the S2 voice model</p><p>Voice model launches usually collapse into benchmark talk. The interesting thing about S2 wasn't a number - it was that the voice was both expressive and controllable, which are usually a tradeoff.</p><p>I built the launch copy around that tension: you can direct the performance, not just generate audio. That gave the announcement a claim people could actually hear the difference in.</p><p>Influencer distribution posts carried the same idea outward and generated <strong>5M+ impressions</strong>.</p>`,
+            role: 'Launch & Influencer Distribution',
+            description: `<p><strong>The product:</strong> S2, a voice model that is expressive <em>and</em> controllable - two things that are normally a tradeoff.</p><p><strong>The problem with launching it:</strong> voice launches drown in benchmark numbers. You cannot hear a benchmark. The single most convincing thing about this model was something an audience had to <em>listen to</em>, and no amount of copy substitutes for that.</p><p><strong>What I did:</strong> I cast for demonstration, not reach - AI-audio people, voice builders, creators who could put the model on screen and let the difference play out loud in the first three seconds. I sourced them, ran the outreach myself, and kept every one of them on the same beat through the launch window.</p><p>Then I wrote each post so the demo carried the claim. The caption's only job was to set up what you were about to hear - direct the performance, don't just generate audio - and then get out of the way.</p><p><strong>Result:</strong> 5M+ impressions.</p>`,
             metrics: [
-                '5M+ impressions from distribution posts',
-                'Launch copy for the S2 voice model',
-                'Framed expressive + controllable voice generation as one claim'
+                '5M+ impressions across the launch',
+                'Cast creators who could demo the model out loud',
+                'Managed the full roster from outreach to publish',
+                'Wrote every post published'
             ],
             tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/FishAudio/status/2082152596739862853"></a></blockquote>`
-        },
-        'playerzero': {
-            name: 'PlayerZero',
-            image: 'assets/playerzero.svg',
-            growth: '2.7M+ Impressions',
-            role: 'Launch Copy',
-            description: `<p><strong>Brief:</strong> Position AI-powered software testing</p><p>"AI for testing" is a crowded, low-signal category. Every tool in it says the same thing.</p><p>The sharper story was what PlayerZero does with the tests: it autonomously finds critical production issues - the bugs that are already costing you, not hypothetical coverage gaps.</p><p>Writing the launch around found production issues rather than testing capability gave the product a concrete, checkable promise. The launch generated <strong>2.7M+ impressions</strong>.</p>`,
-            metrics: [
-                '2.7M+ impressions',
-                'Launch copy for AI-powered software testing',
-                'Positioned around autonomously finding critical production issues'
-            ],
-            tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/akoratana/status/2036111467016319074"></a></blockquote>`
         },
         'polyai': {
             name: 'PolyAI',
             image: 'assets/polyai.svg',
             growth: '3.4M+ Impressions',
-            role: 'Launch Copy',
-            description: `<p><strong>Brief:</strong> Turn complex enterprise voice AI into something people can repeat</p><p>Enterprise voice AI is a category that explains itself badly. The buyer understands it; nobody else does, so the story stops at the buyer.</p><p>I cut the launch copy down to one clear idea: AI agents handling real customer conversations - not IVR trees, not deflection, actual conversations that resolve.</p><p>Keeping the claim concrete let a technical enterprise product travel on a consumer-shaped feed. It generated <strong>3.4M+ impressions</strong>.</p>`,
+            role: 'Launch & Influencer Distribution',
+            description: `<p><strong>The product:</strong> enterprise voice AI - agents that handle real customer conversations at scale.</p><p><strong>The problem with launching it:</strong> enterprise is the hardest launch there is. The buyer understands the product perfectly and absolutely nobody else does, so the story dies at the buyer and never travels a metre further.</p><p><strong>What I did:</strong> I cast operators and business-AI accounts instead of consumer tech ones - people whose audiences have actually sat in a support queue and know exactly how bad the current thing is. I found them, ran the outreach, and managed every relationship through to publish.</p><p>Then I gave all of them one line to carry: AI agents handling real customer conversations. Not IVR trees. Not deflection rates. Not “conversational AI.” One sentence a non-buyer could repeat at a dinner table, written into every post I sent out - which is how an enterprise product ended up travelling on a consumer-shaped feed.</p><p><strong>Result:</strong> 3.4M+ impressions.</p>`,
             metrics: [
-                '3.4M+ impressions',
-                'Launch copy for enterprise voice AI',
-                'Reframed the product around AI agents handling real customer conversations'
+                '3.4M+ impressions across the launch',
+                'Cast operator and business-AI creators, not consumer tech',
+                'Reduced an enterprise product to one repeatable line',
+                'Wrote every post published'
             ],
             tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/polyaivoice/status/2023789465509015972"></a></blockquote>`
+        },
+        'playerzero': {
+            name: 'PlayerZero',
+            image: 'assets/playerzero.svg',
+            growth: '2.7M+ Impressions',
+            role: 'Launch & Influencer Distribution',
+            description: `<p><strong>The product:</strong> AI-powered software testing that autonomously finds critical production issues.</p><p><strong>The problem with launching it:</strong> “AI for testing” is a category where every single product says the same sentence, and engineers have trained themselves to scroll straight past it. You are not launching into curiosity, you are launching into fatigue.</p><p><strong>What I did:</strong> I cast dev and engineering accounts whose audiences have actually been paged at 3am - people for whom a production incident is a memory, not a concept. Sourced them, ran them myself, held the sequence together across the launch.</p><p>And I flipped the framing in every post I wrote: off what the product <em>tests</em> and onto what it <em>finds</em>. Critical production issues, found autonomously, without anyone asking it to look. A promise an engineer can check beats a capability they can't.</p><p><strong>Result:</strong> 2.7M+ impressions.</p>`,
+            metrics: [
+                '2.7M+ impressions across the launch',
+                'Cast dev accounts with real on-call audiences',
+                'Reframed the product from testing to finding',
+                'Wrote every post published'
+            ],
+            tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/akoratana/status/2036111467016319074"></a></blockquote>`
         },
         'wisprflow': {
             name: 'Wispr Flow',
             image: 'assets/wisprflow.svg',
-            growth: 'Launch Campaign',
-            role: 'Launch Copy',
-            description: `<p><strong>Brief:</strong> Launch copy for Wispr Flow</p><p>Wispr Flow turns speech into written text anywhere you already type. The temptation with a product like this is to sell the speech model; the actual shift is behavioural - dictation stops being a fallback and becomes the default way you write.</p><p>The launch copy stayed on that behavioural change rather than the underlying models, and ran from the founder's account.</p>`,
+            growth: '4M+ Views',
+            role: 'Founder-Led Launch & Distribution',
+            description: `<p><strong>The product:</strong> Wispr Flow - you stop typing and start talking, anywhere you already write.</p><p><strong>Why this one was different:</strong> every other launch I ran, the answer was a wide cast. Here it wasn't. Wispr Flow doesn't ask you to try a feature, it asks you to change a habit you've had since you were six years old - and habit changes get sold by one person you already trust, never by twenty you don't. Twenty creators all announcing the same behavioural shift reads as a campaign. One person describing the moment it clicked for them reads as true.</p><p><strong>What I did:</strong> I built it founder-first. The anchor post came from the founder's own account and I wrote it around the moment the habit flips - not the speech models underneath, not the accuracy numbers, the specific instant you stop reaching for the keyboard.</p><p>Then I inverted my usual structure and put the creator layer <em>behind</em> that post instead of in front of it. I still cast and ran the roster myself, but every account I brought in pointed back at the founder's story rather than launching a competing version of it. One story, amplified from every direction, instead of five stories splitting the room.</p><p><strong>Result:</strong> 4M+ views.</p>`,
             metrics: [
-                'Launch copy for the Wispr Flow launch',
-                'Founder-led launch post',
-                'Positioned voice as a default input, not an accessibility fallback'
+                '4M+ views across the launch',
+                'Founder-led anchor post, written by me',
+                'Creator roster sequenced to amplify one story, not compete with it',
+                'Positioned voice as a habit change, not a feature'
             ],
             tweet: `<blockquote class="twitter-tweet" data-theme="dark"><a href="https://twitter.com/tankots/status/2025981424470479008"></a></blockquote>`
         },
