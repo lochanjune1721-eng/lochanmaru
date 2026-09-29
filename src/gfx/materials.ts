@@ -26,6 +26,11 @@ export const U = {
   uRimColor: { value: new Color('#ffc59a') },
   uRimAmt: { value: 0.42 },
   uGroundAO: { value: 0.22 },
+  /** the building under the pointer glows: centre (world), radius, amount 0..1, tint */
+  uHoverPos: { value: new Vector3() },
+  uHoverR: { value: 20 },
+  uHoverAmt: { value: 0 },
+  uHoverCol: { value: new Color('#ffdca8') },
 }
 
 const NOISE_GLSL = /* glsl */ `
@@ -144,6 +149,10 @@ uniform float uGlowGain;
 uniform vec3 uRimColor;
 uniform float uRimAmt;
 uniform float uGroundAO;
+uniform vec3 uHoverPos;
+uniform float uHoverR;
+uniform float uHoverAmt;
+uniform vec3 uHoverCol;
 ${NOISE_GLSL}`,
       )
       .replace('#include <lights_lambert_pars_fragment>', lambertChunk)
@@ -202,7 +211,11 @@ ${
 #endif`
     : ''
 }
-outgoingLight += diffuseColor.rgb * vGlow * uGlowGain;`,
+outgoingLight += diffuseColor.rgb * vGlow * uGlowGain;
+if ( uHoverAmt > 0.001 ) {
+  float hh = ( 1.0 - smoothstep( uHoverR * 0.5, uHoverR, distance( vWPos, uHoverPos ) ) ) * uHoverAmt;
+  outgoingLight += ( diffuseColor.rgb * 0.34 + 0.035 ) * uHoverCol * hh;
+}`,
     )
   }
   m.defines = { ...(m.defines || {}) }

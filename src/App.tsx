@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber'
 import { useEffect, useState } from 'react'
 import { NoToneMapping, PCFShadowMap } from 'three'
 import { installKeyboard } from './engine/input'
+import { installDeepLinks } from './engine/deeplink'
 import { skipIntro } from './engine/journey'
 import { quality } from './engine/quality'
 import { store } from './engine/store'
@@ -30,6 +31,7 @@ const WEBGL = hasWebGL()
 export default function App() {
   const [fontsReady, setFontsReady] = useState(false)
   useEffect(() => installKeyboard(), [])
+  useEffect(() => installDeepLinks(), [])
   useEffect(() => {
     store.getState().setProgress(0.08, 'Warming up the sun')
     loadFonts().then(() => {

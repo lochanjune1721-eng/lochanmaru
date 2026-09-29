@@ -5,9 +5,11 @@ import { game } from './game'
 import { input } from './input'
 import { findNearest, Interactable, registry } from './interact'
 import { pickPlaceAt } from './pick'
-import { closePage, openPage } from './places'
+import { closePage, hoverTag, openPage, places, Place } from './places'
+import { damp } from './math'
 import { player } from './state'
 import { store } from './store'
+import { U } from '../gfx/materials'
 
 const _p = new Vector3()
 
@@ -37,6 +39,21 @@ function pick(camera: PerspectiveCamera, sx: number, sy: number): Interactable |
 }
 
 let lastPlacePick = -1
+let glow = 0
+let glowPlace: Place | null = null
+
+/** The building under the pointer (or a focused name tag) warms up a little, so it reads as clickable. */
+function updateHoverGlow(dt: number) {
+  const st = store.getState()
+  const id = st.page ? null : (st.hoverPlace ?? hoverTag.id)
+  if (id && places[id]) glowPlace = places[id]!
+  glow = damp(glow, id ? 1 : 0, id ? 10 : 6, dt)
+  if (glowPlace && glow > 0.001) {
+    U.uHoverPos.value.copy(glowPlace.focus)
+    U.uHoverR.value = glowPlace.dist * 0.42
+  }
+  U.uHoverAmt.value = glow < 0.002 ? 0 : glow
+}
 
 export function updateInteractions(dt: number, camera: PerspectiveCamera) {
   const st = store.getState()
@@ -106,6 +123,8 @@ export function updateInteractions(dt: number, camera: PerspectiveCamera) {
       else if (id !== st.page) openPage(id)
     }
   }
+
+  updateHoverGlow(dt)
 
   // use key
   if (input.interact) {

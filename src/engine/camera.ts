@@ -8,6 +8,7 @@ import { consumeLook, consumeWheel, input } from './input'
 import { R, mapToN, toTangent } from './planet'
 import { worldColliders } from './collision'
 import type { Place } from './places'
+import { SHEET_H, pageCoverPx, sheetBottom } from './layout'
 import { cam, player } from './state'
 import { walkTerrain } from '../world/terrain'
 import { store } from './store'
@@ -39,9 +40,6 @@ const sm = { dist: NaN, pitch: NaN }
 
 /** the smoothed pose of the page view (so hopping between buildings glides instead of jumping) */
 const pp = { pos: new Vector3(), look: new Vector3(), up: new Vector3(0, 1, 0), ready: false }
-
-/** Width the open page covers on desktop (matches the CSS clamp), in px. */
-export const pageCoverPx = () => Math.min(720, Math.max(440, 0.46 * window.innerWidth)) + 14
 
 /** Spherical interpolation of two points around the planet centre (direction slerped, radius lerped). */
 function slerpPoint(a: Vector3, b: Vector3, e: number, out: Vector3) {
@@ -143,11 +141,14 @@ function placeTarget(p: Place, pos: Vector3, look: Vector3, up: Vector3) {
   const f = p.frame
   const W = window.innerWidth
   const H = window.innerHeight
-  const mobile = W < 760
+  const bottom = sheetBottom()
   const aspect = W / H
-  const free = mobile ? 1 : Math.max(0.3, 1 - pageCoverPx() / W)
-  // the framing distances are designed for a 16:9 window with roughly half of it free
-  const D = p.dist * clamp((1.78 * 0.53) / (aspect * free), 0.85, 2.3)
+  // the framing distances are designed for a 16:9 window with roughly half of it free; back off when the free part is
+  // narrower (fitW) or, for a bottom sheet, shorter (fitH)
+  const freeW = bottom ? 1 : Math.max(0.3, 1 - pageCoverPx() / W)
+  const fitW = (1.78 * 0.53) / (aspect * freeW)
+  const fitH = bottom ? 0.8 / (1 - SHEET_H) : 1
+  const D = p.dist * clamp(Math.max(fitW, fitH), 0.85, 2.6)
   const halfH = Math.tan((cam.fov * Math.PI) / 360) * D
 
   up.copy(f.n)
@@ -155,8 +156,8 @@ function placeTarget(p: Place, pos: Vector3, look: Vector3, up: Vector3) {
   _out.copy(f.fwd).multiplyScalar(Math.cos(p.yaw)).addScaledVector(f.x, Math.sin(p.yaw)).normalize()
   _right.crossVectors(_tmp.copy(_out).negate(), up).normalize()
   look.copy(p.focus)
-  if (!mobile) look.addScaledVector(_right, (pageCoverPx() / H) * halfH)
-  else look.addScaledVector(up, -0.62 * halfH)
+  if (!bottom) look.addScaledVector(_right, (pageCoverPx() / H) * halfH)
+  else look.addScaledVector(up, -SHEET_H * halfH)
   _des.copy(look).addScaledVector(up, Math.sin(p.pitch) * D).addScaledVector(_out, Math.cos(p.pitch) * D)
   boom(look, _des)
   pos.copy(_des)

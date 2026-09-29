@@ -10,6 +10,7 @@ import { store } from './store'
 import { audio } from './audio'
 import { after } from './sim'
 import { quality } from './quality'
+import { openFromHash } from './deeplink'
 
 export function startJourney() {
   const st = store.getState()
@@ -33,6 +34,7 @@ export function startJourney() {
     player.frozen = false
     input.enabled = true
     after(16, () => store.getState().set({ hint: null }))
+    after(0.7, openFromHash)
   })
 }
 
@@ -45,4 +47,5 @@ export function skipIntro() {
   cam.mode = 'follow'
   input.enabled = true
   store.getState().set({ phase: 'playing' })
+  after(0.7, openFromHash)
 }

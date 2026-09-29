@@ -1,4 +1,5 @@
 import { ComponentType, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { syncSheetVars } from '../engine/layout'
 import { closePage, openPage, setSection, stepPage } from '../engine/places'
 import { PlaceId, useStore } from '../engine/store'
 import '../styles/pages.css'
@@ -38,6 +39,12 @@ export function Pages() {
   const dlg = useRef<HTMLElement>(null)
   const scroller = useRef<HTMLDivElement>(null)
   const returnTo = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    syncSheetVars()
+    window.addEventListener('resize', syncSheetVars)
+    return () => window.removeEventListener('resize', syncSheetVars)
+  }, [])
 
   useEffect(() => {
     if (page) {

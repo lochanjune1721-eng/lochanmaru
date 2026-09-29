@@ -3,7 +3,7 @@ import { Vector3 } from 'three'
 import { current } from '../engine/interactions'
 import { clamp } from '../engine/math'
 import { R } from '../engine/planet'
-import { openPage, places, stage } from '../engine/places'
+import { hoverTag, openPage, places, stage } from '../engine/places'
 import { useStore } from '../engine/store'
 import { PAGES, PageGlyph } from './pages/meta'
 import { vars } from './pages/parts'
@@ -50,7 +50,7 @@ export function PlaceTags() {
         // a tag whose anchor has slipped off the top / sides of the screen stays pinned just inside it
         const inView = _p.z < 1 && x > -90 && x < W + 90 && y < H + 40
         x = clamp(x, 70, W - 70)
-        y = Math.max(y, 74)
+        y = Math.max(y, 104)
         const onScreen = inView
         // the OPEN prompt already names the building you're standing at
         const atDoor = current.item?.id === `open-${meta.id}`
@@ -61,7 +61,10 @@ export function PlaceTags() {
       }
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+    return () => {
+      cancelAnimationFrame(raf)
+      hoverTag.id = null
+    }
   }, [])
 
   if (phase !== 'playing' || page) return null
@@ -76,6 +79,10 @@ export function PlaceTags() {
           className={`tag ${hover === p.id ? 'hover' : ''}`}
           style={vars({ '--c': p.color, '--on': p.on })}
           onClick={() => openPage(p.id)}
+          onPointerEnter={() => (hoverTag.id = p.id)}
+          onPointerLeave={() => (hoverTag.id = null)}
+          onFocus={() => (hoverTag.id = p.id)}
+          onBlur={() => (hoverTag.id = null)}
           aria-label={`Open ${p.name}`}
         >
           <span className="tag-ic">

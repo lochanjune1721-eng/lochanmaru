@@ -36,6 +36,9 @@ export interface Place {
 
 export const places: Partial<Record<PlaceId, Place>> = {}
 
+/** A name tag under the pointer / keyboard focus (the ray-cast hover can't see it: it sits above the canvas). */
+export const hoverTag = { id: null as PlaceId | null }
+
 /** The live camera, shared with code that lives outside the React tree (prompts, picking, journeys). */
 export const stage = { camera: null as PerspectiveCamera | null }
 
