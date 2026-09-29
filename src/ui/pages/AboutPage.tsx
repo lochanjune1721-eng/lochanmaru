@@ -12,7 +12,7 @@ const STEPS = [
 const GLANCE = [
   { v: '30+', l: 'Brands scaled' },
   { v: '0 → 1M+', l: 'Followers' },
-  { v: '4', l: 'AI · FinTech · EdTech · Politics' },
+  { v: '4', l: 'Industries: AI · FinTech · EdTech · Politics' },
 ]
 
 /** WHO AM I — the hero line, the story in four beats, where it started, the toolkit. */

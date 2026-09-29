@@ -74,11 +74,14 @@ export function closePage() {
   const st = store.getState()
   const id = st.page
   if (!id) return
-  st.set({ page: null, pageSection: null })
+  // the section is kept until the sheet has slid away, so its content doesn't change under the exit animation
+  st.set({ page: null })
   input.enabled = prevEnabled
   setTimeout(() => {
-    if (store.getState().page !== id) getDoor(id).force = false
-  }, 700)
+    const now = store.getState()
+    if (now.page !== id) getDoor(id).force = false
+    if (!now.page) now.set({ pageSection: null })
+  }, 750)
   bus.emit('page', 'close', id)
 }
 

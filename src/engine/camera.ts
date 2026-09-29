@@ -7,6 +7,7 @@ import { game } from './game'
 import { consumeLook, consumeWheel, input } from './input'
 import { R, mapToN, toTangent } from './planet'
 import { worldColliders } from './collision'
+import { quality } from './quality'
 import type { Place } from './places'
 import { SHEET_H, pageCoverPx, sheetBottom } from './layout'
 import { cam, player } from './state'
@@ -23,6 +24,8 @@ const _tmp = new Vector3()
 const _dirA = new Vector3()
 const _dirB = new Vector3()
 const _out = new Vector3()
+
+let time = 0
 
 export const debugPose = { on: false, pos: new Vector3(), look: new Vector3(), up: new Vector3(0, 1, 0), fov: 38 }
 
@@ -153,17 +156,19 @@ function placeTarget(p: Place, pos: Vector3, look: Vector3, up: Vector3) {
 
   up.copy(f.n)
   // direction from the building towards the camera
-  _out.copy(f.fwd).multiplyScalar(Math.cos(p.yaw)).addScaledVector(f.x, Math.sin(p.yaw)).normalize()
+  // a very slow drift, so the building the page is about never sits perfectly still
+  const drift = quality.reduced ? 0 : 1
+  const yaw = p.yaw + Math.sin(time * 0.32) * 0.045 * drift
+  const pitch = p.pitch + Math.sin(time * 0.21 + 1.3) * 0.012 * drift
+  _out.copy(f.fwd).multiplyScalar(Math.cos(yaw)).addScaledVector(f.x, Math.sin(yaw)).normalize()
   _right.crossVectors(_tmp.copy(_out).negate(), up).normalize()
   look.copy(p.focus)
   if (!bottom) look.addScaledVector(_right, (pageCoverPx() / H) * halfH)
   else look.addScaledVector(up, -SHEET_H * halfH)
-  _des.copy(look).addScaledVector(up, Math.sin(p.pitch) * D).addScaledVector(_out, Math.cos(p.pitch) * D)
+  _des.copy(look).addScaledVector(up, Math.sin(pitch) * D).addScaledVector(_out, Math.cos(pitch) * D)
   boom(look, _des)
   pos.copy(_des)
 }
-
-let time = 0
 
 export function updateCamera(camera: PerspectiveCamera, dt: number) {
   if (debugPose.on) {
