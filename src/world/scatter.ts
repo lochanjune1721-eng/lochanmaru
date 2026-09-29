@@ -3,7 +3,7 @@ import { Color, Vector3 } from 'three'
 import { fbm3, noise3, rng, smoothstep } from '../engine/math'
 import { R, surfaceDistance, mapToN } from '../engine/planet'
 import { P } from '../gfx/palette'
-import { PLAZA, POI_LIST, PONDS, SPAWN, nearestPath } from './layout'
+import { KEEP_CLEAR, PLAZA, POI_LIST, PONDS, SPAWN, nearestPath } from './layout'
 import { shoreDistance, terrain } from './terrain'
 
 export interface Placement {
@@ -92,6 +92,7 @@ export function generateFlora(density = 1): Flora {
     return fibonacci(count, cand)
   }
 
+  const clearNs = KEEP_CLEAR.map((c) => ({ n: mapToN(c.x, c.z), r: c.r }))
   const scratch = new Vector3()
   const info = (n: Vector3) => {
     const s = shoreDistance(n)
@@ -103,7 +104,9 @@ export function generateFlora(density = 1): Flora {
     let dPond = 1e9
     for (const p of pondNs) if (n.dot(p.n) > 0.85) dPond = Math.min(dPond, surfaceDistance(n, p.n) - p.r)
     const dSpawn = surfaceDistance(n, SPAWN_N)
-    return { s, h, dPath: pd.dist - pd.half, dPoi, dPlaza, dPond, dSpawn }
+    let dClear = 1e9
+    for (const c of clearNs) if (n.dot(c.n) > 0.8) dClear = Math.min(dClear, surfaceDistance(n, c.n) - c.r)
+    return { s, h, dPath: pd.dist - pd.half, dPoi, dPlaza, dPond, dSpawn, dClear }
   }
 
   const pushP = (k: FloraKind, n: Vector3, sMin: number, sMax: number, color?: Color, tall = true) => {
@@ -120,7 +123,7 @@ export function generateFlora(density = 1): Flora {
     for (const base of pts) {
       const n = jitterOnSphere(base, spacing(2.1), rand, scratch.clone())
       const i = info(n)
-      if (i.s > -4.5 || i.h < 0.05 || i.dPond < 3.2 || i.dSpawn < 12) continue
+      if (i.s > -4.5 || i.h < 0.05 || i.dPond < 3.2 || i.dSpawn < 12 || i.dClear < 2) continue
       if (i.dPath < 2.6 || i.dPoi < 3 || i.dPlaza < 3.2) continue
       const grove = fbm3(n.x * 3.7 + 2, n.y * 3.7, n.z * 3.7, 3)
       const dry = fbm3(n.x * 2.4 + 9, n.y * 2.4, n.z * 2.4, 2) * 0.5 + 0.5
@@ -164,7 +167,7 @@ export function generateFlora(density = 1): Flora {
       const h = terrain(n)
       if (h < -0.34 || h > 0.05) continue
       const i = info(n)
-      if (i.dPath < 3 || i.dPoi < 2 || i.dSpawn < 13) continue
+      if (i.dPath < 3 || i.dPoi < 2 || i.dSpawn < 13 || i.dClear < 1.5) continue
       if (rand() > 0.22 * dens) continue
       let ok = true
       for (const q of kept) if (q.dot(n) > 0.9968) ok = false
@@ -180,7 +183,7 @@ export function generateFlora(density = 1): Flora {
     for (const base of pts) {
       const n = jitterOnSphere(base, spacing(1.1), rand, scratch.clone())
       const i = info(n)
-      if (i.s > -3 || i.h < 0.02 || i.dPond < 1.8 || i.dSpawn < 8) continue
+      if (i.s > -3 || i.h < 0.02 || i.dPond < 1.8 || i.dSpawn < 8 || i.dClear < 1.2) continue
       if (i.dPath < 1.6 || i.dPoi < 1 || i.dPlaza < 1.4) continue
       const bushN = fbm3(n.x * 5.5 + 4, n.y * 5.5, n.z * 5.5, 2)
       const r = rand()
@@ -216,10 +219,10 @@ export function generateFlora(density = 1): Flora {
       const h = terrain(n)
       if (h < 0.03) continue
       const i = info(n)
-      if (i.dPath < 0.55 || i.dPoi < -0.5 || i.dPlaza < 0.6 || i.dPond < 0.4) continue
+      if (i.dPath < 0.55 || i.dPoi < -0.5 || i.dPlaza < 0.6 || i.dPond < 0.4 || i.dClear < 0.3) continue
       const clump = noise3(n.x * 13, n.y * 13, n.z * 13) * 0.5 + 0.5
       const near = smoothstep(2.4, 0.6, i.dPath)
-      if (rand() < (0.2 + clump * 0.42 + near * 0.3) * dens) pushP('tuft', n, 0.8, 1.6)
+      if (rand() < (0.2 + clump * 0.42 + near * 0.3) * dens) pushP('tuft', n, 0.55, 1.05)
       const fl = fbm3(n.x * 8.8 + 30, n.y * 8.8, n.z * 8.8, 2)
       if (fl > 0.2 && rand() < 0.5 * dens) {
         const pal = [P.pink, P.marigold, P.cream, P.lilac, P.coral]

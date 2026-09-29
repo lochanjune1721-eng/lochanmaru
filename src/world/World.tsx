@@ -18,7 +18,9 @@ import { Home } from './buildings/Home'
 import { Results } from './buildings/Results'
 import { Work } from './buildings/Work'
 import { HorizonCuller } from './cull'
+import { Dressing } from './Dressing'
 import { LightRig } from './LightRig'
+import { Life } from './Life'
 import { Paths } from './Paths'
 import { Planet } from './Planet'
 import { Plaza } from './Plaza'
@@ -70,6 +72,8 @@ export function World() {
         <Paths />
         <Plaza />
         <Scatter />
+        <Dressing />
+        <Life />
         <Home />
         <Experience />
         <Work />

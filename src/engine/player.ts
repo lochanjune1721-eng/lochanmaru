@@ -9,7 +9,7 @@ import { worldColliders } from './collision'
 import { cam, player } from './state'
 import { PLAZA, nearestPath } from '../world/layout'
 import { mapToN } from './planet'
-import { terrain } from '../world/terrain'
+import { deckHeight, walkTerrain } from '../world/terrain'
 
 const WALK = 5.4
 const RUN = 8.4
@@ -31,10 +31,11 @@ function setSurface(dt: number) {
   const now = game.time
   if ((setSurface as any).t > now) return
   ;(setSurface as any).t = now + 0.1
-  const t = terrain(player.n)
+  const t = walkTerrain(player.n)
   player.wet = smoothstep(SEA + 0.15, SEA - 0.45, t)
   let s: typeof player.surface = 'grass'
   if (t < SEA + 0.05) s = 'water'
+  else if (deckHeight(player.n) > -1) s = 'wood'
   else if (surfaceDistance(player.n, plazaN) < PLAZA.r) s = 'tile'
   else {
     const p = nearestPath(player.n)
@@ -47,29 +48,29 @@ function setSurface(dt: number) {
 
 /** Keep the walker on walkable ground by sliding along the shoreline gradient. */
 function clampWalkable(n: Vector3, from: Vector3) {
-  let t = terrain(n)
+  let t = walkTerrain(n)
   if (t >= WALK_MIN) return
   for (let i = 0; i < 5; i++) {
     mapBasisAt(n, _north, _east)
     const e = 0.5
     _tmp.copy(n).addScaledVector(_east, e / R).normalize()
-    const te1 = terrain(_tmp)
+    const te1 = walkTerrain(_tmp)
     _tmp.copy(n).addScaledVector(_east, -e / R).normalize()
-    const te0 = terrain(_tmp)
+    const te0 = walkTerrain(_tmp)
     _tmp.copy(n).addScaledVector(_north, e / R).normalize()
-    const tn1 = terrain(_tmp)
+    const tn1 = walkTerrain(_tmp)
     _tmp.copy(n).addScaledVector(_north, -e / R).normalize()
-    const tn0 = terrain(_tmp)
+    const tn0 = walkTerrain(_tmp)
     const gx = (te1 - te0) / (2 * e)
     const gz = (tn1 - tn0) / (2 * e)
     const g2 = gx * gx + gz * gz
     if (g2 < 1e-6) break
     const k = (WALK_MIN + 0.03 - t) / g2
     n.addScaledVector(_east, (gx * k) / R).addScaledVector(_north, (gz * k) / R).normalize()
-    t = terrain(n)
+    t = walkTerrain(n)
     if (t >= WALK_MIN) return
   }
-  if (terrain(n) < WALK_MIN) n.copy(from)
+  if (walkTerrain(n) < WALK_MIN) n.copy(from)
 }
 
 /** Read steering: camera-relative desired direction (tangent, magnitude 0..1). */
@@ -176,7 +177,7 @@ function scriptedMove(dt: number) {
   toTangent(player.heading, player.up)
   toTangent(player.velDir, player.up)
   toTangent(cam.fwd, player.up)
-  player.pos.copy(player.n).multiplyScalar(R + terrain(player.n))
+  player.pos.copy(player.n).multiplyScalar(R + walkTerrain(player.n))
   player.speed = dist / Math.max(dt, 1e-4)
   player.moved = player.speed
   player.moving = true
@@ -219,7 +220,7 @@ function updateWorld(dt: number) {
   toTangent(player.heading, player.up)
   toTangent(cam.fwd, player.up)
   faceForward(dt, player.up)
-  player.pos.copy(player.n).multiplyScalar(R + terrain(player.n))
+  player.pos.copy(player.n).multiplyScalar(R + walkTerrain(player.n))
   animate(dt, dist)
   setSurface(dt)
 }

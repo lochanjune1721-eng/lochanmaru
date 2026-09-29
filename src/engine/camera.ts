@@ -7,7 +7,7 @@ import { consumeLook, consumeWheel, input } from './input'
 import { R, mapToN, toTangent } from './planet'
 import { worldColliders } from './collision'
 import { cam, player } from './state'
-import { terrain } from '../world/terrain'
+import { walkTerrain } from '../world/terrain'
 import { store } from './store'
 
 const _look = new Vector2()
@@ -142,7 +142,7 @@ function followPose(dt: number, pos: Vector3, look: Vector3, up: Vector3, hardSn
     // stay above the ground
     const r = _des.length()
     const n = _tmp.copy(_des).normalize()
-    const minR = R + terrain(n) + 1.1
+    const minR = R + walkTerrain(n) + 1.1
     if (r < minR) _des.multiplyScalar(minR / r)
   } else {
     if (_des.y < look.y + 1.5) _des.y = look.y + 1.5

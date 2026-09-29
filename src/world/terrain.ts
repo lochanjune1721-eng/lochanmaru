@@ -3,7 +3,7 @@
 import { Vector3 } from 'three'
 import { fbm3, noise3, smoothstep } from '../engine/math'
 import { R, SEA, WALK_MIN, mapToN, nToMap, surfaceDistance } from '../engine/planet'
-import { PLAZA, PONDS, POI_LIST, coastRadius, nearestPath } from './layout'
+import { DOCK, PLAZA, PONDS, POI_LIST, coastRadius, nearestPath } from './layout'
 
 const _m = { x: 0, z: 0, r: 0, theta: 0 }
 
@@ -67,6 +67,22 @@ export function terrain(n: Vector3): number {
     h += hills * land * (1 - flat)
   }
   return h
+}
+
+/** Height of the pier deck at n (or -9 when n is not on the pier). */
+export function deckHeight(n: Vector3) {
+  nToMap(n, _m)
+  const u = DOCK.z - _m.z
+  if (u < -0.4 || u > DOCK.len || Math.abs(_m.x - DOCK.x) > DOCK.halfW) return -9
+  return DOCK.h
+}
+
+/** What the visitor stands on: the terrain, or the pier deck where there is one. */
+export function walkTerrain(n: Vector3) {
+  const t = terrain(n)
+  if (t > DOCK.h) return t
+  const d = deckHeight(n)
+  return d > t ? d : t
 }
 
 export const groundRadius = (n: Vector3) => R + terrain(n)

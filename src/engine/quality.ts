@@ -7,13 +7,16 @@ export interface Quality {
   planetDetail: number
   scatter: number
   antialias: boolean
+  cloudGroups: number
+  birds: number
+  butterflies: number
   mobile: boolean
 }
 
 const TABLE: Record<0 | 1 | 2, Omit<Quality, 'mobile'>> = {
-  0: { tier: 0, dpr: 1.25, shadowMap: 1024, shadows: true, planetDetail: 40, scatter: 0.5, antialias: false },
-  1: { tier: 1, dpr: 1.6, shadowMap: 1536, shadows: true, planetDetail: 52, scatter: 0.8, antialias: true },
-  2: { tier: 2, dpr: 2, shadowMap: 2048, shadows: true, planetDetail: 64, scatter: 1, antialias: true },
+  0: { tier: 0, dpr: 1.25, shadowMap: 1024, shadows: true, planetDetail: 40, scatter: 0.5, antialias: false, cloudGroups: 2, birds: 12, butterflies: 8 },
+  1: { tier: 1, dpr: 1.6, shadowMap: 1536, shadows: true, planetDetail: 52, scatter: 0.8, antialias: true, cloudGroups: 3, birds: 20, butterflies: 14 },
+  2: { tier: 2, dpr: 2, shadowMap: 2048, shadows: true, planetDetail: 64, scatter: 1, antialias: true, cloudGroups: 4, birds: 28, butterflies: 20 },
 }
 
 export function detectQuality(): Quality {

@@ -117,6 +117,26 @@ export const LANDMARKS = {
   boat: { x: 4.2, z: SPAWN.z - 12 },
 }
 
+/** The pier at the arrival beach: a rectangle in the design map (runs south from `z`), walkable at height `h`. */
+export const DOCK = { x: LANDMARKS.dock.x, z: LANDMARKS.dock.z, len: 12.5, halfW: 1.45, h: 0.12 }
+
+/** Little secrets and props that need some clear ground around them (flora is kept away). */
+export const SECRET_SPOTS = {
+  frog: { x: -19 + 4.7 * Math.cos(0.55), z: -17 + 4.7 * Math.sin(0.55) },
+  bottle: { x: -4.2, z: DOCK.z + 1.4 },
+  bench: { x: 17.6, z: -18.4, yaw: 90 * DEG },
+  cactus: { x: 13.5, z: -27 },
+}
+
+export const KEEP_CLEAR: { x: number; z: number; r: number }[] = [
+  { x: DOCK.x, z: DOCK.z - 3, r: 5 },
+  { x: LANDMARKS.windmill.x, z: LANDMARKS.windmill.z, r: 5.6 },
+  { x: SECRET_SPOTS.frog.x, z: SECRET_SPOTS.frog.z, r: 1.6 },
+  { x: SECRET_SPOTS.bottle.x, z: SECRET_SPOTS.bottle.z, r: 1.8 },
+  { x: SECRET_SPOTS.bench.x, z: SECRET_SPOTS.bench.z, r: 2.4 },
+  { x: SECRET_SPOTS.cactus.x, z: SECRET_SPOTS.cactus.z, r: 2.6 },
+]
+
 // ---- helpers ------------------------------------------------------------------------------------
 export function poiN(id: PoiId, out = new Vector3()) {
   const p = POIS[id]
