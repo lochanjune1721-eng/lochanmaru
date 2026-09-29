@@ -29,7 +29,6 @@ let tick = 0
 
 export function HorizonCuller() {
   useFrame(() => {
-    if (game.mode !== 'world') return
     if (tick++ % 5 !== 0) return
     const h = Math.max(0.5, game.camPos.length() - R)
     const camDip = Math.acos(R / (R + h))

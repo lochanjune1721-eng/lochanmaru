@@ -98,8 +98,7 @@ function animate(dt: number, dist: number) {
 }
 
 export function updatePlayer(dt: number) {
-  if (game.mode === 'world') updateWorld(dt)
-  else updateInterior(dt)
+  updateWorld(dt)
 }
 
 function steer(dt: number, up: Vector3) {
@@ -151,47 +150,7 @@ function faceForward(dt: number, up: Vector3) {
   }
 }
 
-function scriptedMove(dt: number) {
-  const s = player.script!
-  s.t = Math.min(1, s.t + dt / s.dur)
-  const e = s.t * s.t * (3 - 2 * s.t)
-  const prev = _tmp.copy(player.n)
-  _nNew.copy(s.from).lerp(s.to, e).normalize()
-  const dist = Math.acos(clamp(prev.dot(_nNew), -1, 1)) * R
-  if (dist > 1e-7) {
-    _q.setFromUnitVectors(prev, _nNew)
-    player.velDir.applyQuaternion(_q)
-    player.heading.applyQuaternion(_q)
-    cam.fwd.applyQuaternion(_q)
-  }
-  // face along the glide
-  _des.copy(s.to).sub(s.from)
-  _des.addScaledVector(_nNew, -_des.dot(_nNew))
-  if (_des.lengthSq() > 1e-8) {
-    _des.normalize()
-    player.heading.lerp(_des, 1 - Math.exp(-14 * dt))
-    player.velDir.copy(_des)
-  }
-  player.n.copy(_nNew)
-  player.up.copy(_nNew)
-  toTangent(player.heading, player.up)
-  toTangent(player.velDir, player.up)
-  toTangent(cam.fwd, player.up)
-  player.pos.copy(player.n).multiplyScalar(R + walkTerrain(player.n))
-  player.speed = dist / Math.max(dt, 1e-4)
-  player.moved = player.speed
-  player.moving = true
-  player.lastMoveAt = game.time
-  animate(dt, dist)
-  if (s.t >= 1) {
-    player.script = null
-    player.speed = 0
-    s.done()
-  }
-}
-
 function updateWorld(dt: number) {
-  if (player.script) return scriptedMove(dt)
   const up = player.up.copy(player.n)
   steer(dt, up)
   let dist = player.speed * dt
@@ -223,30 +182,4 @@ function updateWorld(dt: number) {
   player.pos.copy(player.n).multiplyScalar(R + walkTerrain(player.n))
   animate(dt, dist)
   setSurface(dt)
-}
-
-function updateInterior(dt: number) {
-  const rt = player.interior
-  const up = player.up.set(0, 1, 0)
-  steer(dt, up)
-  let dist = player.speed * dt
-  if (dist > 0 && rt) {
-    _nNew.copy(player.pos).addScaledVector(player.velDir, dist)
-    rt.colliders.resolve(_nNew, player.radius)
-    _nNew.x = clamp(_nNew.x, rt.bounds.minX + player.radius, rt.bounds.maxX - player.radius)
-    _nNew.z = clamp(_nNew.z, rt.bounds.minZ + player.radius, rt.bounds.maxZ - player.radius)
-    _nNew.y = rt.origin.y
-    dist = _tmp.copy(_nNew).sub(player.pos).length()
-    player.pos.copy(_nNew)
-    player.moved = dist / Math.max(dt, 1e-4)
-  } else {
-    player.moved = 0
-  }
-  toTangent(player.velDir, up)
-  toTangent(player.heading, up)
-  toTangent(cam.fwd, up)
-  faceForward(dt, up)
-  player.surface = rt?.floor ?? 'wood'
-  player.wet = 0
-  animate(dt, dist)
 }

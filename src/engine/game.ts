@@ -1,12 +1,9 @@
 // Mutable per-frame game state. Kept outside React so the render loop never triggers re-renders.
 import { Vector3 } from 'three'
 
-export type Mode = 'world' | 'interior'
-
 export const game = {
   time: 0,
   dt: 0,
-  mode: 'world' as Mode,
   /** unit vector of the surface point under the current focus (player / camera target) */
   focusN: new Vector3(0, 0, 1),
   /** world position of the focus point */

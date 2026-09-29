@@ -12,8 +12,6 @@ export interface Interactable {
   label: string
   title?: string
   kind: InteractKind
-  /** 'world' or an interior id */
-  scope: string
   /** optional: only usable from within a cone in front of `dir` (unit, tangent-ish) */
   dir?: Vector3
   dirCos?: number
@@ -39,12 +37,11 @@ const _d = new Vector3()
 
 const _h = new Vector3()
 
-export function findNearest(pos: Vector3, scope: string, up?: Vector3): { item: Interactable; dist: number } | null {
+export function findNearest(pos: Vector3, up?: Vector3): { item: Interactable; dist: number } | null {
   let best: Interactable | null = null
   let bestScore = Infinity
   let bestDist = 0
   for (const i of registry) {
-    if (i.scope !== scope) continue
     if (i.active && !i.active()) continue
     const d = _d.copy(i.anchor).sub(pos).length()
     if (d > i.radius) continue

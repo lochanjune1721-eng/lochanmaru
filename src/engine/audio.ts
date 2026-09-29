@@ -1,7 +1,7 @@
 // Procedural audio: Web Audio only, no asset files. Muted until the visitor opts in.
 //
-//   beds   wind, waves, fountain, birds, chimes and five room tones, cross-faded by where the visitor stands
-//   shots  steps, doors, iris whoosh, paper, discovery ... fired from the event bus
+//   beds   wind, waves, fountain, birds and chimes, cross-faded by where the visitor stands
+//   shots  steps, doors, paper, discovery ... fired from the event bus
 //   all of it -> high-pass -> soft-knee limiter -> master (-16 dB, 0.4 s fades) -> speakers
 //
 // Browsers only start audio after a user gesture, so a returning visitor (audioOn saved) gets capturing listeners that
@@ -9,18 +9,17 @@
 // heard at once); muting fades everything out over 0.4 s, suspend()s the context and stops every timer.
 // Voices are plain functions of (BaseAudioContext, destination, start time, ...) so tests can render them offline.
 import { bus } from './bus'
-import { game } from './game'
 import { clamp, smoothstep } from './math'
 import { mapToN, surfaceDistance } from './planet'
 import { player, Surface } from './state'
-import { InteriorId, useStore } from './store'
+import { useStore } from './store'
 import { PLAZA } from '../world/layout'
 import { shoreDistance } from '../world/terrain'
 
 type Ctx = BaseAudioContext
 export type NoiseKind = 'white' | 'pink' | 'brown'
 export type UiName = 'tick' | 'open' | 'close' | 'discover' | 'door' | 'whoosh' | 'pop'
-export type LayerId = 'wind' | 'waves' | 'fountain' | 'birds' | 'chimes' | InteriorId
+export type LayerId = 'wind' | 'waves' | 'fountain' | 'birds' | 'chimes'
 
 const MASTER = 0.158 // -16 dB
 const FADE = 0.4 // master fade in/out (s)
@@ -241,7 +240,7 @@ export const voices = {
     burst(c, d, t + 0.36, 2300, 0.5, 0.025, { type: 'bandpass', q: 2, a: 0.001 })
     tone(c, d, t + 0.36, 170, 0.3, 0.06, { a: 0.001 })
   },
-  /** Airy noise sweep for the iris wipe (rises when it opens, falls when it closes). */
+  /** Airy noise sweep: the world swinging into view at the start of the journey. */
   whoosh(c: Ctx, d: AudioNode, t: number, dir: 'open' | 'close' = 'open') {
     const [f0, f1] = dir === 'open' ? [450, 2600] : [2600, 450]
     burst(c, d, t, f0, 1.5, 0.34, { type: 'bandpass', q: 0.8, to: f1, a: 0.16 })
@@ -312,42 +311,6 @@ export const voices = {
     const f = rand(1300, 2900)
     tone(c, d, t, f, rand(0.04, 0.09), 0.07, { a: 0.002, to: f * 1.35, glide: 0.03 })
   },
-  /** Clock tick (or tock, a little lower); `deep` is the slow, woody kind. */
-  clock(c: Ctx, d: AudioNode, t: number, deep = false, tock = false) {
-    const k = tock ? 0.82 : 1
-    if (deep) {
-      tone(c, d, t, 196 * k, 0.22, 0.14, { a: 0.003, to: 180 * k, glide: 0.08, parts: [[2.2, 0.3], [3.9, 0.1]] })
-      burst(c, d, t, 1500, 0.35, 0.025, { kind: 'pink', a: 0.001 })
-    } else {
-      burst(c, d, t, 2600 * k, 0.4, 0.014, { type: 'bandpass', q: 3, a: 0.001 })
-      tone(c, d, t, 1350 * k, 0.09, 0.03, { a: 0.001 })
-    }
-  },
-  /** A few pages turning. */
-  rustle(c: Ctx, d: AudioNode, t: number) {
-    let at = t
-    for (let i = 0, n = 3 + Math.floor(rand(0, 4)); i < n; i++, at += rand(0.015, 0.07)) {
-      burst(c, d, at, rand(3500, 6500), rand(0.15, 0.3), rand(0.02, 0.05), { type: 'bandpass', q: 0.6, a: 0.006 })
-    }
-  },
-  /** A counter rolling up: 5-9 tiny ticks climbing in pitch. */
-  counter(c: Ctx, d: AudioNode, t: number) {
-    for (let i = 0, n = 5 + Math.floor(rand(0, 5)); i < n; i++) tone(c, d, t + i * 0.05, 1900 * Math.pow(1.045, i), 0.09, 0.03, { a: 0.001 })
-  },
-  /** One distant foghorn blast: two detuned saws and a sub through a dark low-pass, drooping as it runs out of breath. */
-  horn(c: Ctx, d: AudioNode, t: number) {
-    const f = rand(90, 104)
-    const fs = [f, f * 1.007, f / 2]
-    const saws = [osc(c, 'sawtooth', fs[0]), osc(c, 'sawtooth', fs[1]), osc(c, 'sine', fs[2])]
-    const [lp, trim, g] = [filt(c, 'lowpass', 280, 1.1), gain(c, 0.35), gain(c, 0)]
-    saws.forEach((o, i) => {
-      o.frequency.setValueAtTime(fs[i], t)
-      o.frequency.exponentialRampToValueAtTime(fs[i] * 0.96, t + 3.2)
-      o.connect(lp)
-    })
-    link(lp, trim, g, d)
-    fin(c, t, env(g.gain, t, 0.14, 0.9, 2.4), saws, [lp, trim, g])
-  },
 }
 
 /** Cheap convolution reverb: `secs` of stereo noise that decays 60 dB and darkens as it fades. */
@@ -394,14 +357,6 @@ function bed(c: Ctx, dest: AudioNode, kind: NoiseKind, type: BiquadFilterType, f
   link(s, b, g, dest)
   s.start(0, rand(0, 2))
   return [g, b] as const
-}
-/** Persistent sines, each [freq, amp], summed into dest. */
-function hum(c: Ctx, dest: AudioNode, parts: number[][]) {
-  for (const [f, a] of parts) {
-    const o = osc(c, 'sine', f)
-    link(o, gain(c, a), dest)
-    o.start()
-  }
 }
 /** Slow sine LFO of amplitude `depth` added to each param. */
 function lfo(c: Ctx, rate: number, depth: number, ...ps: AudioParam[]) {
@@ -492,80 +447,26 @@ export const BEDS: Record<LayerId, (c: Ctx, wet: AudioNode) => Layer> = {
     }
     return { out, tick: every(() => rand(6, 15), note, () => rand(2, 7)) }
   },
-  home(c) {
-    // warm room tone (dark noise and a faint hum pair) plus a tiny 1 Hz mechanical clock
-    const out = gain(c, 0)
-    bed(c, out, 'brown', 'bandpass', 200, 0.3, 0.6)
-    hum(c, out, [[110, 0.03], [165.6, 0.03]])
-    let tock = false
-    return { out, tick: every(() => 1, (t) => voices.clock(c, out, t, false, (tock = !tock))) }
-  },
-  experience(c) {
-    // deep room tone, slow grandfather-clock ticks, and the odd rustle of paper
-    const out = gain(c, 0)
-    bed(c, out, 'brown', 'bandpass', 170, 0.3, 0.6, 0.9)
-    let tock = false
-    const clock = every(() => 2, (t) => voices.clock(c, out, t, true, (tock = !tock)))
-    const paper = every(() => rand(2.5, 7), (t) => voices.rustle(c, out, t), () => rand(1, 4))
-    return {
-      out,
-      tick: (now) => {
-        clock(now)
-        paper(now)
-      },
-    }
-  },
-  work(c) {
-    // projector: noise gated at ~24 Hz over a low motor hum, plus a distant crowd murmuring at syllable rate
-    const out = gain(c, 0)
-    lfo(c, 24, 0.24, bed(c, out, 'white', 'bandpass', 1300, 0.4, 0.9)[0].gain)
-    hum(c, out, [[50, 0.02], [100.4, 0.02]])
-    const talk = [bed(c, out, 'pink', 'bandpass', 420, 0.4, 2, 0.8)[0].gain, bed(c, out, 'pink', 'bandpass', 1050, 0.4, 2.5, 0.8)[0].gain]
-    lfo(c, 3.3, 0.24, ...talk)
-    lfo(c, 5.1, 0.16, ...talk)
-    lfo(c, 0.27, 0.12, ...talk)
-    return { out }
-  },
-  results(c) {
-    // mains hum with a few harmonics, slightly detuned so it beats; every so often a counter rolls up
-    const out = gain(c, 0)
-    hum(c, out, [[60, 0.02], [120.4, 0.03], [180, 0.03], [240.6, 0.02], [300, 0.012]])
-    return { out, tick: every(() => rand(8, 15), (t) => voices.counter(c, out, t), () => rand(3, 8)) }
-  },
-  hire(c, wet) {
-    // lighthouse drone (two lows beating slowly), a faint sea wash, and a foghorn about every 40 s
-    const out = gain(c, 0)
-    hum(c, out, [[55, 0.05], [55.6, 0.05], [110.3, 0.04], [165.2, 0.015]])
-    lfo(c, 0.11, 0.1, bed(c, out, 'brown', 'bandpass', 260, 0.3, 0.5, 0.8)[0].gain)
-    const horns = gain(c)
-    link(horns, out)
-    sends.set(horns, wet)
-    return { out, tick: every(() => rand(30, 50), (t) => voices.horn(c, horns, t), () => rand(8, 20)) }
-  },
 }
 const IDS = Object.keys(BEDS) as LayerId[]
 
 // ---- where the visitor stands -> how present each bed is -> the graph ----------------------------------------------
 export interface Zone {
-  room: InteriorId | null
   orbit: boolean // title screen: the planet seen from far away
-  panel: boolean
+  page: boolean // a building's page is open
   plaza: number // surface distance to the fountain (units)
   shore: number // |distance to the shoreline| (units)
 }
 
 /** Bed presence (0..1) for a zone. */
 export function levels(z: Zone): Record<LayerId, number> {
-  const out = z.room ? 0 : 1 // rooms mute every outdoor bed
-  const near = z.orbit ? 0 : out
-  const room = (id: InteriorId) => +(z.room === id)
+  const near = z.orbit ? 0 : 1
   return {
-    wind: out * (z.orbit ? 0.7 : 0.4 + 0.6 * smoothstep(3, 40, z.plaza)), // a little stronger the further from the plaza
+    wind: z.orbit ? 0.7 : 0.4 + 0.6 * smoothstep(3, 40, z.plaza), // a little stronger the further from the plaza
     waves: near * smoothstep(14, 2, z.shore),
     fountain: near * smoothstep(14, 1.5, z.plaza),
-    birds: near * (z.panel ? 0 : 1),
-    chimes: out,
-    home: room('home'), experience: room('experience'), work: room('work'), results: room('results'), hire: room('hire'),
+    birds: near * (z.page ? 0 : 1),
+    chimes: 1,
   }
 }
 
@@ -602,7 +503,7 @@ export function buildGraph(c: Ctx, dest: AudioNode = c.destination): Graph {
     sfx,
     update(now, z) {
       const lv = levels(z)
-      const dq = z.panel ? 0.5 : 1 // reading a panel: ambience halves (attack 0.2 s, slower release)
+      const dq = z.page ? 0.5 : 1 // reading a page: ambience halves (attack 0.2 s, slower release)
       if (dq !== duckQ) {
         duckQ = dq
         duck.gain.setTargetAtTime(dq, now, dq < 1 ? 0.2 : 0.7)
@@ -637,13 +538,11 @@ const plazaN = mapToN(PLAZA.x, PLAZA.z)
 /** Read the visitor's whereabouts from the game (cheap enough for a 10 Hz poll). */
 export function zone(): Zone {
   const st = useStore.getState()
-  const room = game.mode === 'interior' ? st.interior : null
   return {
-    room,
-    panel: !!st.panel,
+    page: !!st.page,
     orbit: st.phase === 'loading' || st.phase === 'intro', // wind and chimes only
-    plaza: room ? 99 : surfaceDistance(player.n, plazaN), // interiors have their own coordinates
-    shore: room ? 99 : Math.abs(shoreDistance(player.n)),
+    plaza: surfaceDistance(player.n, plazaN),
+    shore: Math.abs(shoreDistance(player.n)),
   }
 }
 
@@ -788,15 +687,14 @@ function init() {
     const now = performance.now()
     if (now - lastStep < 90) return // rate limit
     lastStep = now
-    const soft = surface === 'grass' || surface === 'sand' || surface === 'water'
-    shot(voices.step, game.mode === 'interior' && soft ? 'wood' : surface, speed)
+    shot(voices.step, surface, speed)
   })
   bus.on('land', () => shot(voices.land))
-  bus.on('door', () => shot(voices.door))
-  bus.on('iris', (dir: 'open' | 'close') => shot(voices.whoosh, dir))
-  bus.on('enter', () => shot(voices.arrive, true))
-  bus.on('exit', () => shot(voices.arrive, false))
-  bus.on('panel', (kind: string) => {
+  bus.on('page', (kind: string) => {
+    if (kind === 'open') {
+      shot(voices.door)
+      shot(voices.arrive, true)
+    }
     shot(voices.paper, kind === 'open')
     control() // duck (or un-duck) right away instead of on the next tick
   })

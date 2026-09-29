@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import { SECRETS } from '../content/secrets'
 import { audio } from '../engine/audio'
-import { InteriorId, useStore } from '../engine/store'
+import { openPage } from '../engine/places'
+import { useStore } from '../engine/store'
 import { input } from '../engine/input'
-import { roomProgress } from '../interiors/kit'
-
-const PLACES: InteriorId[] = ['home', 'experience', 'work', 'results', 'hire']
+import { PAGES, PageGlyph } from './pages/meta'
+import { vars } from './pages/parts'
 
 export function toggleSound() {
   const st = useStore.getState()
@@ -29,10 +29,8 @@ export function Hud() {
   const hint = useStore((s) => s.hint)
   const toast = useStore((s) => s.toast)
   const touch = useStore((s) => s.touch)
-  const panel = useStore((s) => s.panel)
+  const page = useStore((s) => s.page)
   const set = useStore((s) => s.set)
-  const room = useStore((s) => s.interior)
-  useStore((s) => s.seenTick)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -52,33 +50,44 @@ export function Hud() {
     return () => clearInterval(t)
   }, [hint, set])
 
-  const prog = room ? roomProgress(room) : { done: 0, total: 0 }
   if (phase === 'loading' || phase === 'starting') return null
-  const n = PLACES.filter((p) => visited[p]).length
+  const n = PAGES.filter((p) => visited[p.id]).length
   return (
     <>
       {phase === 'playing' && (
         <>
           <div className="hud-tl">
             <div className="wordmark">Lochan’s World</div>
-            <div className="dots" title="Places discovered" aria-label={`${n} of 5 places discovered`}>
-              {PLACES.map((p) => (
-                <i key={p} className={visited[p] ? 'on' : ''} />
+            <nav className="dots" aria-label={`Places — ${n} of 5 visited`}>
+              {PAGES.map((p) => (
+                <button
+                  key={p.id}
+                  className={`${visited[p.id] ? 'seen' : ''} ${page === p.id ? 'on' : ''}`}
+                  style={vars({ '--c': p.color, '--on': p.on })}
+                  title={p.label}
+                  aria-label={`Open ${p.name}`}
+                  onClick={() => openPage(p.id)}
+                >
+                  <PageGlyph id={p.id} size={14} />
+                </button>
               ))}
-              {secrets.length > 0 && <b>✦ {secrets.length}/{SECRETS.length}</b>}
-              {room && prog.total > 2 && <em className="prog">{prog.done}/{prog.total} explored</em>}
-            </div>
+              {secrets.length > 0 && (
+                <b title="Little secrets found">
+                  ✦ {secrets.length}/{SECRETS.length}
+                </b>
+              )}
+            </nav>
           </div>
-          {hint === 'controls' && !panel && (
+          {hint === 'controls' && !page && (
             <div className="hint">
               {touch ? (
-                <>Left thumb to walk · right to look</>
+                <>Left thumb to walk · right to look · tap a building to open it</>
               ) : (
                 <>
                   <kbd>W</kbd>
                   <kbd>A</kbd>
                   <kbd>S</kbd>
-                  <kbd>D</kbd> walk · drag to look · <kbd>E</kbd> to interact
+                  <kbd>D</kbd> walk · drag to look · click a building to open it
                 </>
               )}
             </div>

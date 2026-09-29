@@ -66,7 +66,6 @@ function Clouds() {
   const mat = useMemo(() => worldMaterial({ rim: false }), [])
   const refs = useRef<Group[]>([])
   useFrame((_, dt) => {
-    if (game.mode !== 'world') return
     groups.forEach((g, i) => {
       const o = refs.current[i]
       if (o) o.rotateOnWorldAxis(g.axis, g.speed * Math.min(dt, 0.05))
@@ -156,7 +155,6 @@ function Birds() {
     return { mesh: m, orbits }
   }, [N])
   useFrame(() => {
-    if (game.mode !== 'world') return
     const t = game.time
     for (let i = 0; i < N; i++) {
       const o = orbits[i]
@@ -236,7 +234,6 @@ function Butterflies() {
   }, [N])
   const o = useMemo(() => new Object3D(), [])
   useFrame(() => {
-    if (game.mode !== 'world') return
     const t = game.time
     for (let i = 0; i < homes.length; i++) {
       const h = homes[i]
@@ -295,7 +292,6 @@ function Dust() {
   useEffect(() => {
     const c = new Color()
     return bus.on('step', (surface: string, speed: number) => {
-      if (game.mode !== 'world') return
       const n = speed > 6.5 ? 3 : 1
       for (let k = 0; k < n; k++) {
         const i = data.next++ % DUST_N
@@ -313,7 +309,6 @@ function Dust() {
     })
   }, [data])
   useFrame((_, dt) => {
-    if (game.mode !== 'world') return
     const d = Math.min(dt, 0.05)
     for (let i = 0; i < DUST_N; i++) {
       const a = data.age.getX(i)

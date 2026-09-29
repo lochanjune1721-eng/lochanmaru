@@ -2,7 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
 import { PerspectiveCamera } from 'three'
 import { installDebug } from '../engine/debug'
-import { stage } from '../engine/scenes'
+import { stage } from '../engine/places'
 import { simStep } from '../engine/sim'
 
 /** One ordered simulation step per frame: player -> interactions -> camera. */

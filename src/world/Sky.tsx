@@ -5,8 +5,6 @@ import { game } from '../engine/game'
 import { R, mapBasisAt } from '../engine/planet'
 import { makeSkyMaterial } from '../gfx/materials'
 import { DEG } from '../engine/math'
-import { LOOK } from '../interiors/presets'
-import { store } from '../engine/store'
 import { P } from '../gfx/palette'
 
 const _n = new Vector3()
@@ -26,17 +24,6 @@ export function Sky() {
     if (!mesh) return
     mesh.position.copy(camera.position)
     const u = mat.uniforms
-    if (game.mode === 'interior') {
-      const k = LOOK[store.getState().interior!]
-      u.cZenith.value.set(k.skyTop)
-      u.cMid.value.set(k.skyMid)
-      u.cHorizon.value.set(k.skyHor)
-      u.uUp.value.set(0, 1, 0)
-      u.uHorizon.value = k.horizon ?? -0.35
-      u.uSunDir.value.set(0, -1, 0)
-      u.uMoonDir.value.set(0, -1, 0)
-      return
-    }
     u.cZenith.value.set(P.skyZenith)
     u.cMid.value.set(P.skyMid)
     u.cHorizon.value.set(P.fog)

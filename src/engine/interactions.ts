@@ -1,9 +1,11 @@
-// Per-frame interaction logic: nearest interactable -> prompt, use key, pointer hover/click, glance.
+// Per-frame interaction logic: nearest interactable -> prompt, use key, pointer hover/click on things and buildings.
 import { PerspectiveCamera, Vector3 } from 'three'
 import { bus } from './bus'
 import { game } from './game'
 import { input } from './input'
-import { findNearest, Interactable } from './interact'
+import { findNearest, Interactable, registry } from './interact'
+import { pickPlaceAt } from './pick'
+import { closePage, openPage } from './places'
 import { player } from './state'
 import { store } from './store'
 
@@ -12,19 +14,14 @@ const _p = new Vector3()
 export const hover = { item: null as Interactable | null, x: 0, y: 0 }
 export const current = { item: null as Interactable | null, dist: 0 }
 
-function scope() {
-  return game.mode === 'world' ? 'world' : store.getState().interior ?? 'world'
-}
-
-/** Screen-space pick against interactable anchors (cheap and forgiving). */
+/** Screen-space pick against interactable anchors (cheap and forgiving). Doors are handled by the building itself. */
 function pick(camera: PerspectiveCamera, sx: number, sy: number): Interactable | null {
   const w = window.innerWidth
   const h = window.innerHeight
   let best: Interactable | null = null
   let bestD = 56
-  const sc = scope()
-  for (const i of currentPool) {
-    if (i.scope !== sc) continue
+  for (const i of registry) {
+    if (i.kind === 'door') continue
     if (i.active && !i.active()) continue
     _p.copy(i.anchor).project(camera)
     if (_p.z > 1) continue
@@ -39,16 +36,14 @@ function pick(camera: PerspectiveCamera, sx: number, sy: number): Interactable |
   return best
 }
 
-import { registry } from './interact'
-const currentPool = registry
+let lastPlacePick = -1
 
 export function updateInteractions(dt: number, camera: PerspectiveCamera) {
   const st = store.getState()
-  const playing = st.phase === 'playing' && !st.panel && input.enabled
-  const sc = scope()
+  const playing = st.phase === 'playing' && !st.page && input.enabled
 
   // nearest usable
-  let found = playing && !player.frozen ? findNearest(player.pos, sc, player.up) : null
+  const found = playing && !player.frozen ? findNearest(player.pos, player.up) : null
   const prev = current.item
   current.item = found ? found.item : null
   current.dist = found ? found.dist : 0
@@ -65,15 +60,27 @@ export function updateInteractions(dt: number, camera: PerspectiveCamera) {
     }
   }
 
-  // pointer hover + click
-  if (input.hoverX >= 0 && playing) {
-    const h = pick(camera, input.hoverX, input.hoverY)
+  // pointer hover: small things first, then buildings (with a page open only the *other* buildings answer)
+  const paged = st.phase === 'playing' && !!st.page
+  if (input.hoverX >= 0 && (playing || paged)) {
+    const h = playing ? pick(camera, input.hoverX, input.hoverY) : null
     hover.item = h
-    document.body.style.cursor = h ? 'pointer' : ''
+    let place = st.hoverPlace
+    if (h) place = null
+    else if (game.time - lastPlacePick > 0.07 || lastPlacePick < 0) {
+      lastPlacePick = game.time
+      place = pickPlaceAt(camera, input.hoverX, input.hoverY)
+      if (place && place === st.page) place = null
+    }
+    if (place !== st.hoverPlace) store.getState().set({ hoverPlace: place })
+    document.body.style.cursor = h || place ? 'pointer' : ''
   } else {
     hover.item = null
+    if (st.hoverPlace) store.getState().set({ hoverPlace: null })
     if (document.body.style.cursor === 'pointer') document.body.style.cursor = ''
   }
+
+  // click / tap
   if (input.clickX >= 0) {
     const cx = input.clickX
     const cy = input.clickY
@@ -82,15 +89,21 @@ export function updateInteractions(dt: number, camera: PerspectiveCamera) {
     if (playing) {
       const c = pick(camera, cx, cy)
       if (c) {
-        if (current.item === c) {
-          use(c)
-        } else {
-          // too far: walk there
-          _p.copy(c.anchor)
-          player.autoTarget = _p.clone()
+        if (current.item === c) use(c)
+        else {
+          // too far to use: walk over there
+          player.autoTarget = c.anchor.clone()
           bus.emit('walk-to', c)
         }
+      } else {
+        const id = pickPlaceAt(camera, cx, cy)
+        if (id) openPage(id)
       }
+    } else if (paged) {
+      // a page is open: clicking another building hops to it, clicking the open air puts the page away
+      const id = pickPlaceAt(camera, cx, cy)
+      if (!id) closePage()
+      else if (id !== st.page) openPage(id)
     }
   }
 

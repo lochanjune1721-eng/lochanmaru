@@ -9,7 +9,7 @@ import { mapBasisAt, mapToN, nToMap } from './planet'
 import { cam, player } from './state'
 import { store } from './store'
 import { groundPoint } from '../world/terrain'
-import { buildings, scene } from './scenes'
+import { closePage, openPage, places } from './places'
 import { registry } from './interact'
 import { toTangent } from './planet'
 
@@ -23,8 +23,9 @@ export function installDebug(camera: PerspectiveCamera, gl?: WebGLRenderer) {
     input,
     current,
     registry,
-    buildings,
-    scene,
+    places,
+    openPage,
+    closePage,
     step(n = 1, dt = 1 / 30) {
       for (let i = 0; i < n; i++) simStep(dt, camera)
     },
@@ -62,7 +63,7 @@ export function installDebug(camera: PerspectiveCamera, gl?: WebGLRenderer) {
       game.up.copy(n)
       game.focus.copy(g)
     },
-    /** absolute free camera (interior inspection) */
+    /** absolute free camera */
     freeCam(pos: [number, number, number], look: [number, number, number], fov = 40) {
       debugPose.on = true
       debugPose.pos.set(...pos)
@@ -72,7 +73,7 @@ export function installDebug(camera: PerspectiveCamera, gl?: WebGLRenderer) {
     },
     /** stand a few steps in front of a building's door, facing it */
     goDoor(id: string, back = 0.5) {
-      const b = (buildings as any)[id]
+      const b = (places as any)[id]
       if (!b) return false
       const n = b.outN.clone().lerp(b.door.clone().normalize(), back).normalize()
       player.n.copy(n)

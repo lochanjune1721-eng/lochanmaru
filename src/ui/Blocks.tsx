@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
-import { hidePanel } from '../engine/panel'
-import { Block, PanelContent, useStore } from '../engine/store'
+import { useState } from 'react'
+import type { Block } from '../engine/store'
 
-function Embeds({ title, urls }: { title?: string; urls: string[] }) {
+export function Embeds({ title, urls }: { title?: string; urls: string[] }) {
   const [on, setOn] = useState(false)
   return (
     <div className="b-emb">
@@ -31,7 +30,7 @@ function Embeds({ title, urls }: { title?: string; urls: string[] }) {
   )
 }
 
-function BlockView({ b }: { b: Block }) {
+export function BlockView({ b }: { b: Block }) {
   switch (b.t) {
     case 'lead':
       return <p className="b-lead">{b.text}</p>
@@ -106,68 +105,4 @@ function BlockView({ b }: { b: Block }) {
         </div>
       )
   }
-}
-
-/** The content card. Slides in beside the thing you're looking at; the world stays visible behind it. */
-export function Panel() {
-  const panel = useStore((s) => s.panel)
-  const touch = useStore((s) => s.touch)
-  const [shown, setShown] = useState<PanelContent | null>(null)
-  const [open, setOpen] = useState(false)
-  const body = useRef<HTMLDivElement>(null)
-  const closeBtn = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    if (panel) {
-      setShown(panel)
-      const r = requestAnimationFrame(() => setOpen(true))
-      if (body.current) body.current.scrollTop = 0
-      return () => cancelAnimationFrame(r)
-    }
-    setOpen(false)
-    const t = setTimeout(() => setShown(null), 650)
-    return () => clearTimeout(t)
-  }, [panel])
-
-  useEffect(() => {
-    if (open) closeBtn.current?.focus({ preventScroll: true })
-  }, [open])
-
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.code === 'Escape') hidePanel()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open])
-
-  if (!shown) return null
-  return (
-    <>
-      <div className={`scrim ${open ? 'show' : ''}`} onClick={hidePanel} />
-      <aside className={`panel ${open ? 'show' : ''}`} style={{ ['--accent' as string]: shown.accent ?? '#f2a33c' }} role="dialog" aria-modal="false" aria-label={shown.title}>
-        <header className="panel-head">
-          {shown.kicker && <div className="kick">{shown.kicker}</div>}
-          <h2>{shown.title}</h2>
-          {shown.subtitle && <div className="subt">{shown.subtitle}</div>}
-          {shown.image && <img className="logo" src={shown.image.src} alt={shown.image.alt} />}
-          <button ref={closeBtn} className="panel-x" onClick={hidePanel} aria-label="Close">
-            <svg viewBox="0 0 16 16">
-              <path d="M3 3l10 10M13 3L3 13" />
-            </svg>
-          </button>
-        </header>
-        <div className="panel-body" ref={body}>
-          {shown.blocks.map((b, i) => (
-            <BlockView key={i} b={b} />
-          ))}
-        </div>
-        <footer className="panel-foot">
-          <span>{touch ? 'Tap × to go back' : 'Esc — back to the world'}</span>
-          <span>Lochan’s World</span>
-        </footer>
-      </aside>
-    </>
-  )
 }

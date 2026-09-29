@@ -432,7 +432,6 @@ function Windmill() {
         label: 'SPIN',
         title: 'Windmill',
         kind: 'secret',
-        scope: 'world',
         look: frame.toWorld(0, 5.1, 1.8),
         onUse: () => {
           spin.boost = 1
@@ -541,7 +540,6 @@ function Secrets() {
         label: opts.label,
         title: opts.title,
         kind: 'secret',
-        scope: 'world',
         look: f.toWorld(0, opts.look ? opts.look[1] : opts.ly, 0),
         onUse: () => {
           if (id === 'frog') hop.current = 0

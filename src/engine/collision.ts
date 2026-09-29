@@ -1,11 +1,11 @@
-// Tiny 2D collision layer. Static colliders live in a local tangent frame (on the planet) or
-// directly in the XZ plane (interiors). Circles + oriented boxes, sliding resolution.
+// Tiny 2D collision layer. Static colliders live in a local tangent frame on the planet.
+// Circles + oriented boxes, sliding resolution.
 import { Vector3 } from 'three'
 import { R } from './planet'
 
 export interface Collider {
   kind: 'circle' | 'box'
-  /** world-space centre (unit vector for the planet, absolute position for interiors) */
+  /** centre as a unit vector on the planet */
   c: Vector3
   /** local tangent axes */
   ex: Vector3
@@ -15,16 +15,15 @@ export interface Collider {
   r: number
   /** height, used by the camera to decide whether a wall occludes it */
   h: number
-  /** coarse rejection: cosine of the angular reach (planet) */
+  /** coarse rejection: cosine of the angular reach */
   cosReach: number
-  /** squared planar reach (interiors) */
-  reach2: number
   solid: boolean
 }
 
+const _u = new Vector3()
+
 export class ColliderSet {
   list: Collider[] = []
-  constructor(readonly planet: boolean) {}
 
   circle(c: Vector3, ex: Vector3, ez: Vector3, r: number, h = 3) {
     const col: Collider = {
@@ -37,7 +36,6 @@ export class ColliderSet {
       r,
       h,
       cosReach: Math.cos((r + 2.5) / R),
-      reach2: (r + 2.5) * (r + 2.5),
       solid: true,
     }
     this.list.push(col)
@@ -56,7 +54,6 @@ export class ColliderSet {
       r: 0,
       h,
       cosReach: Math.cos(reach / R),
-      reach2: reach * reach,
       solid: true,
     }
     this.list.push(col)
@@ -67,28 +64,17 @@ export class ColliderSet {
     this.list.length = 0
   }
 
-  /**
-   * Push point `p` out of any colliders. On the planet `p` is a unit vector (modified + renormalised),
-   * in interiors it is an absolute position. Returns true if anything pushed back.
-   */
+  /** Push the unit vector `p` out of any colliders (modified + renormalised). Returns true if anything pushed back. */
   resolve(p: Vector3, radius: number): boolean {
     let hit = false
     for (let iter = 0; iter < 2; iter++) {
       let any = false
       for (const c of this.list) {
         if (!c.solid) continue
-        let dx: number, dy: number, dz: number
-        if (this.planet) {
-          if (p.dot(c.c) < c.cosReach) continue
-          dx = (p.x - c.c.x) * R
-          dy = (p.y - c.c.y) * R
-          dz = (p.z - c.c.z) * R
-        } else {
-          dx = p.x - c.c.x
-          dy = p.y - c.c.y
-          dz = p.z - c.c.z
-          if (dx * dx + dz * dz > c.reach2) continue
-        }
+        if (p.dot(c.c) < c.cosReach) continue
+        const dx = (p.x - c.c.x) * R
+        const dy = (p.y - c.c.y) * R
+        const dz = (p.z - c.c.z) * R
         const lx = dx * c.ex.x + dy * c.ex.y + dz * c.ex.z
         const lz = dx * c.ez.x + dy * c.ez.y + dz * c.ez.z
         let px = 0
@@ -121,14 +107,13 @@ export class ColliderSet {
             else pz = (lz >= 0 ? 1 : -1) * (ez + radius)
           }
         }
-        const k = this.planet ? 1 / R : 1
-        p.x += (c.ex.x * px + c.ez.x * pz) * k
-        p.y += (c.ex.y * px + c.ez.y * pz) * k
-        p.z += (c.ex.z * px + c.ez.z * pz) * k
+        p.x += (c.ex.x * px + c.ez.x * pz) / R
+        p.y += (c.ex.y * px + c.ez.y * pz) / R
+        p.z += (c.ex.z * px + c.ez.z * pz) / R
         any = true
         hit = true
       }
-      if (this.planet) p.normalize()
+      p.normalize()
       if (!any) break
     }
     return hit
@@ -136,20 +121,13 @@ export class ColliderSet {
 
   /** is a point inside any collider taller than `minH`? (used by the camera boom) */
   blocks(p: Vector3, pad: number, minH: number): boolean {
+    const u = _u.copy(p).normalize()
     for (const c of this.list) {
       if (!c.solid || c.h < minH) continue
-      let dx: number, dy: number, dz: number
-      if (this.planet) {
-        const u = p.clone().normalize()
-        if (u.dot(c.c) < c.cosReach) continue
-        dx = (u.x - c.c.x) * R
-        dy = (u.y - c.c.y) * R
-        dz = (u.z - c.c.z) * R
-      } else {
-        dx = p.x - c.c.x
-        dy = p.y - c.c.y
-        dz = p.z - c.c.z
-      }
+      if (u.dot(c.c) < c.cosReach) continue
+      const dx = (u.x - c.c.x) * R
+      const dy = (u.y - c.c.y) * R
+      const dz = (u.z - c.c.z) * R
       const lx = dx * c.ex.x + dy * c.ex.y + dz * c.ex.z
       const lz = dx * c.ez.x + dy * c.ez.y + dz * c.ez.z
       if (c.kind === 'circle') {
@@ -160,4 +138,4 @@ export class ColliderSet {
   }
 }
 
-export const worldColliders = new ColliderSet(true)
+export const worldColliders = new ColliderSet()

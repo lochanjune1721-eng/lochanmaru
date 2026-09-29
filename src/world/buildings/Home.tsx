@@ -11,7 +11,7 @@ import { signTexture } from '../../gfx/text'
 import { POIS } from '../layout'
 import { Placed, boxCollider, circleCollider, makeFrame } from '../place'
 import { registerCullable } from '../cull'
-import { Door, SignBoard, useBuildingDoor } from './parts'
+import { Door, SignBoard, usePlace } from './parts'
 import { Forecourt } from './Forecourt'
 
 const R1 = 5.4
@@ -130,7 +130,7 @@ export function Home() {
   const halo = useMemo(() => glowSpriteMaterial('#ffb84a', 0.75), [])
   const root = useRef<Group>(null)
 
-  useBuildingDoor({ id: 'home', label: poi.label, color: '#f2a33c', frame, doorZ: PORCH_Z })
+  usePlace({ id: 'home', label: poi.label, color: '#f2a33c', frame, roots: [root], doorZ: PORCH_Z, focus: [0, 9.5, 2], dist: 46, pitch: 0.3, yaw: 0.45, tag: [0, 7.6, PORCH_Z + 1] })
 
   useEffect(() => {
     const offs = [

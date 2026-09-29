@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { current } from '../engine/interactions'
 import { use } from '../engine/interactions'
-import { stage } from '../engine/scenes'
+import { stage } from '../engine/places'
 import { useStore } from '../engine/store'
 import { Vector3 } from 'three'
 

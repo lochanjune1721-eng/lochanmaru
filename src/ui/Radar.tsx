@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { Vector3 } from 'three'
-import { game } from '../engine/game'
 import { R, mapToN } from '../engine/planet'
 import { cam, player } from '../engine/state'
 import { store } from '../engine/store'
@@ -48,44 +47,42 @@ export function Radar() {
       g.moveTo(6, cy)
       g.lineTo(S - 6, cy)
       g.stroke()
-      if (game.mode === 'world') {
-        _r.crossVectors(cam.fwd, player.up).normalize()
-        for (const p of pois) {
-          _t.copy(p.n).addScaledVector(player.n, -p.n.dot(player.n))
-          const ang = Math.acos(Math.min(1, Math.max(-1, p.n.dot(player.n))))
-          const dist = ang * R
-          if (_t.lengthSq() < 1e-9) continue
-          _t.normalize()
-          const fx = _t.dot(cam.fwd)
-          const rx = _t.dot(_r)
-          let d = Math.min(dist, RANGE) / RANGE
-          d = Math.pow(d, 0.75)
-          const rad = (S / 2 - 15) * d
-          const x = cx + rx * rad
-          const y = cy - fx * rad
-          const far = dist > RANGE
-          g.globalAlpha = far ? 0.6 : 1
-          g.fillStyle = COLORS[p.id]
-          g.strokeStyle = '#2b2438'
-          g.lineWidth = 1.6
+      _r.crossVectors(cam.fwd, player.up).normalize()
+      for (const p of pois) {
+        _t.copy(p.n).addScaledVector(player.n, -p.n.dot(player.n))
+        const ang = Math.acos(Math.min(1, Math.max(-1, p.n.dot(player.n))))
+        const dist = ang * R
+        if (_t.lengthSq() < 1e-9) continue
+        _t.normalize()
+        const fx = _t.dot(cam.fwd)
+        const rx = _t.dot(_r)
+        let d = Math.min(dist, RANGE) / RANGE
+        d = Math.pow(d, 0.75)
+        const rad = (S / 2 - 15) * d
+        const x = cx + rx * rad
+        const y = cy - fx * rad
+        const far = dist > RANGE
+        g.globalAlpha = far ? 0.6 : 1
+        g.fillStyle = COLORS[p.id]
+        g.strokeStyle = '#2b2438'
+        g.lineWidth = 1.6
+        g.beginPath()
+        g.arc(x, y, visited[p.id as keyof typeof visited] ? 8 : 7, 0, Math.PI * 2)
+        g.fill()
+        g.stroke()
+        g.fillStyle = '#fff8ea'
+        g.font = '700 9px "DM Mono", monospace'
+        g.textAlign = 'center'
+        g.textBaseline = 'middle'
+        g.fillText(GLYPH[p.id], x, y + 0.5)
+        if (visited[p.id as keyof typeof visited]) {
+          g.strokeStyle = '#f7c04a'
+          g.lineWidth = 2
           g.beginPath()
-          g.arc(x, y, visited[p.id as keyof typeof visited] ? 8 : 7, 0, Math.PI * 2)
-          g.fill()
+          g.arc(x, y, 10.5, 0, Math.PI * 2)
           g.stroke()
-          g.fillStyle = '#fff8ea'
-          g.font = '700 9px "DM Mono", monospace'
-          g.textAlign = 'center'
-          g.textBaseline = 'middle'
-          g.fillText(GLYPH[p.id], x, y + 0.5)
-          if (visited[p.id as keyof typeof visited]) {
-            g.strokeStyle = '#f7c04a'
-            g.lineWidth = 2
-            g.beginPath()
-            g.arc(x, y, 10.5, 0, Math.PI * 2)
-            g.stroke()
-          }
-          g.globalAlpha = 1
         }
+        g.globalAlpha = 1
       }
       // you
       g.fillStyle = '#2b2438'

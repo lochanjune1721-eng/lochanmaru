@@ -22,8 +22,10 @@ export function Help() {
           <dd>Walk</dd>
           <dt>Right thumb</dt>
           <dd>Look around</dd>
+          <dt>Tap a building</dt>
+          <dd>Open its page</dd>
           <dt>Round button</dt>
-          <dd>Enter, read, open — whatever’s near</dd>
+          <dd>Open, read, poke — whatever’s near</dd>
         </dl>
       ) : (
         <dl>
@@ -40,14 +42,16 @@ export function Help() {
           <dd>Hurry up a little</dd>
           <dt>Drag / scroll</dt>
           <dd>Look around / zoom</dd>
+          <dt>Click a building</dt>
+          <dd>Open its page</dd>
           <dt>
             <kbd>E</kbd>
           </dt>
-          <dd>Enter, read, open (or click the thing)</dd>
+          <dd>Open, read, poke — whatever’s near</dd>
           <dt>
             <kbd>Esc</kbd>
           </dt>
-          <dd>Close a card</dd>
+          <dd>Close the page (← → hop between buildings)</dd>
           <dt>
             <kbd>M</kbd>
           </dt>

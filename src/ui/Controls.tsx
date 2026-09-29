@@ -39,7 +39,8 @@ export function Controls() {
       }
       const leftHalf = e.clientX < window.innerWidth * 0.5
       const hasStick = [...ptrs.values()].some((p) => p.kind === 'stick')
-      const kind: P['kind'] = touch && leftHalf && !hasStick ? 'stick' : 'look'
+      // the floating stick only exists while walking is allowed (not while a page is open)
+      const kind: P['kind'] = touch && leftHalf && !hasStick && input.enabled ? 'stick' : 'look'
       ptrs.set(e.pointerId, { id: e.pointerId, kind, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t0: performance.now(), moved: 0 })
       if (kind === 'stick') showStick(e.clientX, e.clientY)
       else input.dragging = true
@@ -86,13 +87,11 @@ export function Controls() {
       if (!p) return
       ptrs.delete(e.pointerId)
       if (p.kind === 'stick') hideStick()
-      else {
-        if (![...ptrs.values()].some((q) => q.kind === 'look')) input.dragging = false
-        // a tap/click that barely moved
-        if (p.moved < 8 && performance.now() - p.t0 < 500) {
-          input.clickX = e.clientX
-          input.clickY = e.clientY
-        }
+      else if (![...ptrs.values()].some((q) => q.kind === 'look')) input.dragging = false
+      // a tap/click that barely moved (a quick tap on the left half starts the stick, but it is still a tap)
+      if (p.moved < 8 && performance.now() - p.t0 < 500) {
+        input.clickX = e.clientX
+        input.clickY = e.clientY
       }
     }
 

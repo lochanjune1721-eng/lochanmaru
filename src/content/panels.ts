@@ -1,12 +1,10 @@
-// Content -> panel blocks. The Panel UI only knows about blocks, so every interior reuses one system.
+// Content -> page blocks. The case-study and chapter views only know about blocks (ui/Blocks.tsx), so both share one renderer.
 import type { Block, PanelContent } from '../engine/store'
-import { HERO, SKILLS, STORY } from './about'
-import { CHANNELS, CLOSER, DOORS } from './contact'
 import type { Chapter } from './experience'
 import { CHAPTERS } from './experience'
 import { PROJECTS, WINGS, projectById } from './projects'
 import type { Project } from './projects'
-import { LINKS, SITE, mailFor } from './site'
+import { LINKS, mailFor } from './site'
 
 const wingName = (id: string) => WINGS.find((w) => w.id === id)?.name ?? ''
 
@@ -25,7 +23,7 @@ export function projectPanel(p: Project): PanelContent {
         { label: 'LinkedIn', href: LINKS.linkedin },
       ],
     })
-    return { id: p.id, kicker: `Case study · ${wingName(p.wing)}`, title: p.name, subtitle: 'Details on request', accent, blocks }
+    return { id: p.id, kicker: wingName(p.wing), title: p.name, subtitle: 'Details on request', accent, blocks }
   }
 
   if (p.hook) blocks.push({ t: 'lead', text: p.hook })
@@ -62,8 +60,8 @@ function splitMetric(m: string): { value: string; label: string } {
 export function chapterPanel(c: Chapter): PanelContent {
   const blocks: Block[] = []
   if (c.source === 'brief') {
-    blocks.push({ t: 'lead', text: 'One of the rooms on this street.' })
-    blocks.push({ t: 'p', text: 'Ask me about it — the story is better in person.' })
+    blocks.push({ t: 'lead', text: 'Another chapter — best told in person.' })
+    blocks.push({ t: 'p', text: 'Ask Lochan about it and you’ll hear the story straight from the source.' })
     blocks.push({
       t: 'links',
       items: [
@@ -93,114 +91,6 @@ export function chapterPanel(c: Chapter): PanelContent {
     subtitle: c.title,
     accent: c.color,
     blocks,
-  }
-}
-
-export type AboutPart = 'hello' | 'origin' | 'turn' | 'craft' | 'both' | 'skills'
-
-export function aboutPanel(part: AboutPart): PanelContent {
-  switch (part) {
-    case 'hello':
-      return {
-        id: 'about-hello',
-        kicker: SITE.roles.join(' · '),
-        title: SITE.name,
-        subtitle: HERO.lead,
-        accent: '#f2a33c',
-        blocks: [
-          { t: 'lead', text: HERO.lead },
-          { t: 'p', text: HERO.body },
-          { t: 'tags', items: [...SITE.roles] },
-        ],
-      }
-    case 'origin':
-      return {
-        id: 'about-origin',
-        kicker: 'Where I’m from',
-        title: 'A small town in Rajasthan',
-        accent: '#d9744f',
-        blocks: [
-          { t: 'lead', text: STORY.origin },
-          { t: 'p', text: 'National Institute of Technology, Karnataka.' },
-        ],
-      }
-    case 'turn':
-      return {
-        id: 'about-turn',
-        kicker: 'The turn',
-        title: 'How ideas spread',
-        accent: '#2f9591',
-        blocks: [{ t: 'lead', text: STORY.turn }],
-      }
-    case 'craft':
-      return {
-        id: 'about-craft',
-        kicker: 'The craft',
-        title: 'From curiosity to craft',
-        accent: '#3e4392',
-        blocks: [{ t: 'lead', text: STORY.craft }],
-      }
-    case 'both':
-      return {
-        id: 'about-both',
-        kicker: 'Engineer × storyteller',
-        title: 'Logic meets creativity',
-        accent: '#e2493f',
-        blocks: [{ t: 'lead', text: STORY.both }],
-      }
-    case 'skills':
-      return {
-        id: 'about-skills',
-        kicker: 'Toolkit',
-        title: 'Skills',
-        accent: '#f2a33c',
-        blocks: [{ t: 'tags', items: [...SKILLS] }],
-      }
-  }
-}
-
-export function doorPanel(id: string): PanelContent | null {
-  const d = DOORS.find((x) => x.id === id)
-  if (!d) return null
-  return {
-    id: `door-${d.id}`,
-    kicker: 'Hire Lochan',
-    title: d.label,
-    accent: d.color,
-    blocks: [
-      { t: 'lead', text: d.line },
-      { t: 'links', items: [{ label: `Start a conversation →`, href: d.href, note: LINKS.email }] },
-    ],
-  }
-}
-
-export function contactPanel(): PanelContent {
-  return {
-    id: 'contact',
-    kicker: 'Hire Lochan',
-    title: CLOSER,
-    accent: '#e2493f',
-    blocks: [
-      { t: 'links', items: CHANNELS.map((c) => ({ label: c.label, href: c.href, note: c.value })) },
-    ],
-  }
-}
-
-/** One contact channel as a panel (used by the objects in the Hire room). */
-export function channelPanel(id: string): PanelContent | null {
-  const c = CHANNELS.find((x) => x.id === id)
-  if (!c) return null
-  const verb: Record<string, string> = { email: 'Write an email', x: 'Say hi on X', linkedin: 'Connect on LinkedIn', instagram: 'Follow on Instagram', phone: 'Call', resume: 'Open the résumé' }
-  return {
-    id: `channel-${c.id}`,
-    kicker: 'Hire Lochan',
-    title: c.label,
-    subtitle: c.value,
-    accent: '#e2493f',
-    blocks: [
-      { t: 'links', items: [{ label: `${verb[c.id] ?? c.label} →`, href: c.href, note: c.value }] },
-      { t: 'quote', text: CLOSER },
-    ],
   }
 }
 

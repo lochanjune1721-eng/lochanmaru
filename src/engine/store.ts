@@ -1,10 +1,10 @@
 // Discrete UI/game state (things React needs to re-render for). Per-frame data lives in `game`/`player`.
 import { create } from 'zustand'
 
-export type InteriorId = 'home' | 'experience' | 'work' | 'results' | 'hire'
+export type PlaceId = 'home' | 'experience' | 'work' | 'results' | 'hire'
 export type Phase = 'loading' | 'intro' | 'starting' | 'playing'
 
-// ---- panel content model (rendered by ui/Panel.tsx) ----------------------------------------------
+// ---- content block model (rendered by ui/Blocks.tsx) ------------------------------------------------
 export type Block =
   | { t: 'p'; text: string }
   | { t: 'lead'; text: string }
@@ -37,28 +37,27 @@ interface State {
   phase: Phase
   loadProgress: number
   loadLabel: string
-  interior: InteriorId | null
+  /** the building whose page is open (null = walking around) */
+  page: PlaceId | null
+  /** optional deep link inside the page (a chapter id, a project id …) */
+  pageSection: string | null
   prompt: { label: string; title?: string; key: string; kind: string } | null
-  panel: PanelContent | null
-  visited: Partial<Record<InteriorId, boolean>>
+  visited: Partial<Record<PlaceId, boolean>>
   secrets: string[]
   audioOn: boolean
   touch: boolean
   toast: Toast | null
   hint: string | null
-  nearPoi: InteriorId | null
+  /** the building under the pointer */
+  hoverPlace: PlaceId | null
   helpOpen: boolean
   textOpen: boolean
-  /** bumps whenever an interior object is used (so the HUD can recount progress) */
-  seenTick: number
 
   set: (p: Partial<State>) => void
   setProgress: (p: number, label?: string) => void
-  markVisited: (id: InteriorId) => void
+  markVisited: (id: PlaceId) => void
   addSecret: (id: string) => boolean
   showToast: (text: string, kind?: Toast['kind']) => void
-  openPanel: (p: PanelContent) => void
-  closePanel: () => void
 }
 
 let toastId = 0
@@ -77,7 +76,7 @@ const saved = (() => {
   try {
     const j = JSON.parse(localStorage.getItem('lw:save') || '{}')
     return {
-      visited: (j.visited && typeof j.visited === 'object' ? j.visited : {}) as Partial<Record<InteriorId, boolean>>,
+      visited: (j.visited && typeof j.visited === 'object' ? j.visited : {}) as Partial<Record<PlaceId, boolean>>,
       secrets: (Array.isArray(j.secrets) ? j.secrets.filter((x: unknown) => typeof x === 'string') : []) as string[],
     }
   } catch {
@@ -96,19 +95,18 @@ export const useStore = create<State>((set, get) => ({
   phase: 'loading',
   loadProgress: 0,
   loadLabel: 'Warming up the sun',
-  interior: null,
+  page: null,
+  pageSection: null,
   prompt: null,
-  panel: null,
   visited: saved.visited,
   secrets: saved.secrets,
   audioOn: savedAudio,
   touch: typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches,
   toast: null,
   hint: null,
-  nearPoi: null,
+  hoverPlace: null,
   helpOpen: false,
   textOpen: false,
-  seenTick: 0,
 
   set: (p) => set(p),
   setProgress: (p, label) => set({ loadProgress: Math.max(get().loadProgress, p), ...(label ? { loadLabel: label } : {}) }),
@@ -131,8 +129,6 @@ export const useStore = create<State>((set, get) => ({
     set({ toast: { id: ++toastId, text, kind } })
     toastTimer = setTimeout(() => set({ toast: null }), 4200)
   },
-  openPanel: (p) => set({ panel: p }),
-  closePanel: () => set({ panel: null }),
 }))
 
 export const store = useStore

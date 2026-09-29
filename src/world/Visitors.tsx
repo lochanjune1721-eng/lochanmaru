@@ -163,7 +163,6 @@ export function Visitors() {
   }
 
   useFrame((_, dtRaw) => {
-    if (game.mode !== 'world') return
     const dt = Math.min(dtRaw, 0.05)
     const t = game.time
     for (const s of npcs) {
@@ -175,7 +174,7 @@ export function Visitors() {
         continue
       }
       const dPlayer = s.pos.distanceTo(player.pos)
-      const watching = dPlayer < 5.2 && game.mode === 'world' && !player.frozen
+      const watching = dPlayer < 5.2 && !player.frozen
       let want = 0
       if (watching) {
         // stop and turn to look at the visitor
@@ -227,7 +226,6 @@ export function Visitors() {
         label: 'CHAT',
         title: s.def.title,
         kind: 'npc',
-        scope: 'world',
         look: s.look,
         onUse: () => {
           const line = s.def.lines[s.line++ % s.def.lines.length]

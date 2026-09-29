@@ -1,6 +1,5 @@
 import { Vector3 } from 'three'
 import { cam, player } from './state'
-import { game } from './game'
 import { mapBasisAt, mapToN } from './planet'
 import { SPAWN } from '../world/layout'
 import { groundPoint } from '../world/terrain'
@@ -22,7 +21,5 @@ export function resetPlayerToSpawn() {
   player.speed = 0
   player.stride = 0
   player.autoTarget = null
-  game.mode = 'world'
-  player.interior = null
   resetFollowSmoothing()
 }

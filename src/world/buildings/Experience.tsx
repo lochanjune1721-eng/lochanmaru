@@ -5,11 +5,10 @@ import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import { Color, Group, Matrix4, Texture, Vector3 } from 'three'
 import { Chapter, chapterById } from '../../content/experience'
-import { chapterPanel } from '../../content/panels'
 import { register } from '../../engine/interact'
 import { game } from '../../engine/game'
 import { DEG } from '../../engine/math'
-import { showPanel } from '../../engine/panel'
+import { openPage } from '../../engine/places'
 import { mapToN } from '../../engine/planet'
 import { store } from '../../engine/store'
 import { GeoBuilder } from '../../gfx/geo'
@@ -20,7 +19,7 @@ import { registerCullable } from '../cull'
 import { POIS } from '../layout'
 import { Frame3, Mat4, Placed, boxCollider, circleCollider, compassDir, frameFromUnit, geodesic } from '../place'
 import { ribbon } from '../ribbon'
-import { Door, SignBoard, useBuildingDoor } from './parts'
+import { Door, SignBoard, usePlace } from './parts'
 
 const RC = 12.5
 const STEP = 11 * DEG
@@ -296,6 +295,7 @@ export function Experience() {
   const halo = useMemo(() => glowSpriteMaterial('#ffbf5a', 0.7), [])
   const clockFrame = useMemo(() => frameFromUnit(L.cn, compassDir(L.cn, 90 * DEG)), [L])
   const root = useRef<Group>(null)
+  const clockRoot = useRef<Group>(null)
   const hands = useRef<Group[]>([])
   const groundTex = useMemo(() => timelineTexture(L.mods, L.start, L.end), [L])
   const walk = useMemo(() => {
@@ -318,7 +318,7 @@ export function Experience() {
     [L],
   )
 
-  useBuildingDoor({ id: 'experience', label: poi.label, color: '#2f9591', frame: L.main, doorZ: 0.14, lookY: 2.2 })
+  usePlace({ id: 'experience', label: poi.label, color: '#2f9591', frame: L.main, roots: [root, clockRoot], doorZ: 0.14, lookY: 2.2, focus: [0, 4, RC], dist: 56, pitch: 0.34, yaw: 0.35, tag: [0, 8.2, 1] })
 
   useEffect(() => {
     const offs: (() => void)[] = []
@@ -335,14 +335,13 @@ export function Experience() {
           id: `peek-${ch.id}`,
           anchor,
           radius: 3.1,
-          label: 'PEEK IN',
+          label: 'OPEN CHAPTER',
           title: ch.name,
           kind: 'object',
-          scope: 'world',
           dir: m.frame.dir(0, 1),
           dirCos: 0.45,
           look: m.frame.toWorld(0, 2.2, 0.4),
-          onUse: () => showPanel(chapterPanel(ch), m.frame.toWorld(0, 2.4, 0.6), 7.5),
+          onUse: () => openPage('experience', ch.id),
         }),
       )
     }
@@ -354,7 +353,6 @@ export function Experience() {
         label: 'LOOK UP',
         title: 'The clock',
         kind: 'secret',
-        scope: 'world',
         look: clockFrame.toWorld(0, 7.3, 0),
         onUse: () => {
           const st = store.getState()
@@ -391,6 +389,7 @@ export function Experience() {
       {/* courtyard: pavement with the years, and the clock */}
       <mesh geometry={walk} material={walkMat} receiveShadow renderOrder={1} />
       <Placed frame={clockFrame}>
+        <group ref={clockRoot}>
         <mesh geometry={clockGeo} material={mat} castShadow receiveShadow />
         {[0, 1, 2, 3].map((k) => {
           const a = (k * Math.PI) / 2
@@ -428,6 +427,7 @@ export function Experience() {
           )
         })}
         <sprite material={halo} position={[0, 7.3, 0]} scale={[8, 8, 1]} />
+        </group>
       </Placed>
     </>
   )

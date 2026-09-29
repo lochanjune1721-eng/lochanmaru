@@ -3,10 +3,9 @@
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
 import { AdditiveBlending, Color, ConeGeometry, DoubleSide, Group, ShaderMaterial, Vector3 } from 'three'
-import { contactPanel } from '../../content/panels'
 import { register } from '../../engine/interact'
 import { game } from '../../engine/game'
-import { showPanel } from '../../engine/panel'
+import { openPage } from '../../engine/places'
 import { store } from '../../engine/store'
 import { GeoBuilder } from '../../gfx/geo'
 import { glowSpriteMaterial, worldMaterial } from '../../gfx/materials'
@@ -16,7 +15,7 @@ import { registerCullable } from '../cull'
 import { POIS } from '../layout'
 import { Placed, boxCollider, circleCollider, makeFrame, subFrame } from '../place'
 import { addBench, addLamp, addMailbox, addPlanter, V3 } from '../props'
-import { Door, SignBoard, useBuildingDoor } from './parts'
+import { Door, SignBoard, usePlace } from './parts'
 
 const TOWER_Y0 = 0.5
 const TOWER_H = 15.5
@@ -207,7 +206,7 @@ export function Hire() {
   const courtHalo = useMemo(() => glowSpriteMaterial('#ffbf5a', 0.85), [])
   const gy = TOWER_Y0 + TOWER_H
 
-  useBuildingDoor({ id: 'hire', label: poi.label, color: '#e2493f', frame, doorZ: COTTAGE_Z + 0.16, lookY: 1.9 })
+  usePlace({ id: 'hire', label: poi.label, color: '#e2493f', frame, roots: [root], doorZ: COTTAGE_Z + 0.16, lookY: 1.9, focus: [0, 11, 1], dist: 46, pitch: 0.3, yaw: 0.42, tag: [0, 8, COTTAGE_Z + 1] })
 
   useEffect(() => {
     const offs = [
@@ -226,12 +225,11 @@ export function Hire() {
         label: 'OPEN',
         title: 'Mailbox',
         kind: 'link',
-        scope: 'world',
         look: frame.toWorld(5.2, 1.3, COTTAGE_Z + 2.4),
         onUse: () => {
           const st = store.getState()
-          st.addSecret('mailbox')
-          showPanel(contactPanel(), frame.toWorld(5.2, 1.4, COTTAGE_Z + 2.4), 7.5)
+          if (st.addSecret('mailbox')) st.showToast('You found the mailbox. Now write a letter.', 'secret')
+          openPage('hire', 'contact')
         },
       }),
     ]

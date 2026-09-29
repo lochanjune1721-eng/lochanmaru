@@ -15,7 +15,7 @@ import { POIS } from '../layout'
 import { Placed, boxCollider, circleCollider, makeFrame } from '../place'
 import { addBench, addLamp, addPlanter, V3 } from '../props'
 import { LedScreen } from './led'
-import { Door, SignBoard, useBuildingDoor } from './parts'
+import { Door, SignBoard, usePlace } from './parts'
 import { damp } from '../../engine/math'
 
 const BASE_R = 6.4
@@ -152,7 +152,7 @@ export function Results() {
   }, [])
   const courtHalo = useMemo(() => glowSpriteMaterial('#ffbf5a', 0.85), [])
 
-  useBuildingDoor({ id: 'results', label: poi.label, color: '#3e4392', frame, doorZ: PORCH_Z + 0.16, lookY: 2.0 })
+  usePlace({ id: 'results', label: poi.label, color: '#3e4392', frame, roots: [root], doorZ: PORCH_Z + 0.16, lookY: 2.0, focus: [0, 19, 2], dist: 64, pitch: 0.28, yaw: 0.35, tag: [0, 7.6, PORCH_Z + 1] })
 
   useEffect(() => {
     const offs = [
@@ -210,7 +210,7 @@ export function Results() {
   useFrame((_, dt) => {
     const t = game.time
     const d = player.pos.distanceTo(frame.base)
-    wake.current = damp(wake.current, game.mode === 'world' && d < 48 ? 1.35 : 0, d < 48 ? 0.9 : 0.5, Math.min(dt, 0.05))
+    wake.current = damp(wake.current, d < 48 ? 1.35 : 0, d < 48 ? 0.9 : 0.5, Math.min(dt, 0.05))
     if (crown.current) crown.current.rotation.y = t * 0.22
     rings.current.forEach((r, i) => {
       if (!r) return

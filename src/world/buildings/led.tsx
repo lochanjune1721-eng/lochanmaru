@@ -29,7 +29,7 @@ export function LedScreen({
   texW?: number
   texH?: number
   range?: number
-  /** optional external gate (e.g. interior visible) */
+  /** optional external gate */
   active?: () => boolean
 }) {
   const { canvas, ctx, tex } = useMemo(() => {

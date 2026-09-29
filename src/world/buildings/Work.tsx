@@ -17,7 +17,7 @@ import { POIS } from '../layout'
 import { Placed, boxCollider, circleCollider, makeFrame, subFrame } from '../place'
 import { ribbon } from '../ribbon'
 import { Bulbs, LedScreen } from './led'
-import { Door, SignBoard, useBuildingDoor } from './parts'
+import { Door, SignBoard, usePlace } from './parts'
 import { addBench, addLamp, addPlanter, V3 } from '../props'
 
 const FRONT = 8.1
@@ -331,7 +331,7 @@ export function Work() {
     return { geo: b.build(), glows }
   }, [])
 
-  useBuildingDoor({ id: 'work', label: poi.label, color: '#e2493f', frame, doorZ: FRONT + 0.16, lookY: 2.0, radius: 6.2 })
+  usePlace({ id: 'work', label: poi.label, color: '#e2493f', frame, roots: [root], doorZ: FRONT + 0.16, lookY: 2.0, radius: 6.2, focus: [0, 8, 3], dist: 50, pitch: 0.3, yaw: 0.42, tag: [0, 7, FRONT + 3.4] })
 
   useEffect(() => {
     const offs = [
@@ -351,7 +351,6 @@ export function Work() {
         label: 'KNOCK',
         title: 'Ticket booth',
         kind: 'secret',
-        scope: 'world',
         look: frame.toWorld(8.6, 1.8, FRONT + 6.4),
         onUse: () => {
           const st = store.getState()

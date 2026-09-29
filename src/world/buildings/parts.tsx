@@ -1,13 +1,12 @@
 import { useFrame } from '@react-three/fiber'
-import { useEffect, useMemo, useRef } from 'react'
-import { BufferGeometry, Color, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Texture, Vector3 } from 'three'
+import { RefObject, useEffect, useMemo, useRef } from 'react'
+import { BufferGeometry, Color, Group, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, Texture, Vector3 } from 'three'
 import { damp } from '../../engine/math'
-import { game } from '../../engine/game'
 import { register } from '../../engine/interact'
 import { toTangent } from '../../engine/planet'
-import { buildings, enterBuilding, getDoor } from '../../engine/scenes'
+import { Place, getDoor, openPage, places } from '../../engine/places'
 import { player } from '../../engine/state'
-import { InteriorId } from '../../engine/store'
+import { PlaceId } from '../../engine/store'
 import { GeoBuilder } from '../../gfx/geo'
 import { worldMaterial } from '../../gfx/materials'
 import { P } from '../../gfx/palette'
@@ -98,11 +97,7 @@ export function Door({
   const world = useMemo(() => frame.toWorld(position[0], 0, position[2]), [frame, position])
 
   useFrame((_, dt) => {
-    let target = 0
-    if (game.mode === 'world') {
-      const d = player.pos.distanceTo(world)
-      if (d < 7.5) target = 1
-    }
+    let target = player.pos.distanceTo(world) < 7.5 ? 1 : 0
     if (st.force) target = 1
     st.open = damp(st.open, target, target > st.open ? 5.5 : 3.2, Math.min(dt, 0.05))
     if (hinge.current) hinge.current.rotation.y = st.open * 1.72
@@ -121,56 +116,70 @@ export function Door({
   )
 }
 
-// ---- register the building's door with the engine ------------------------------------------------------
-export function useBuildingDoor(opts: {
-  id: InteriorId
+// ---- register the building as a place you can open ----------------------------------------------------------
+export function usePlace(opts: {
+  id: PlaceId
   label: string
   color: string
   frame: Frame3
+  /** groups holding the building's meshes (clicking / hovering any of them targets this building) */
+  roots: RefObject<Object3D | null>[]
   /** local z of the door plane (front wall surface) */
   doorZ: number
   doorX?: number
-  /** local height to aim the camera / glance at */
+  /** local height of the door (for glances) */
   lookY?: number
+  /** how close you have to be for the "open" prompt */
   radius?: number
+  /** camera framing while the page is open — what it looks at (building space), how far, how high, how far round */
+  focus: [number, number, number]
+  dist: number
+  pitch?: number
+  yaw?: number
+  /** where the floating name tag hangs (building space) */
+  tag: [number, number, number]
 }) {
-  const { id, label, color, frame, doorZ, doorX = 0, lookY = 1.9, radius = 5.4 } = opts
+  const { id, label, color, frame, roots, doorZ, doorX = 0, lookY = 1.9, radius = 5.4, focus, dist, pitch = 0.32, yaw = 0.42, tag } = opts
   useEffect(() => {
     const out = frame.dir(0, 1)
     const door = frame.toWorld(doorX, 0, doorZ)
     const outN = frame.unit(doorX, doorZ + 6.2)
-    const outDir = toTangent(out.clone(), outN)
-    const rt = {
+    const place: Place = {
       id,
       label,
       color,
+      frame,
       door,
-      insideN: frame.unit(doorX, doorZ - 3.2),
       outN,
-      outDir,
+      outDir: toTangent(out.clone(), outN),
       doorLook: frame.toWorld(doorX, lookY, doorZ),
+      focus: frame.toWorld(focus[0], focus[1], focus[2]),
+      dist,
+      pitch,
+      yaw,
+      labelAt: frame.toWorld(tag[0], tag[1], tag[2]),
+      roots: roots.map((r) => r.current).filter((o): o is Object3D => !!o),
     }
-    buildings[id] = rt
-    const anchor = frame.toWorld(doorX, lookY + 0.6, doorZ + 0.8)
+    places[id] = place
     const off = register({
-      id: `enter-${id}`,
-      anchor,
+      id: `open-${id}`,
+      anchor: frame.toWorld(doorX, lookY + 0.6, doorZ + 0.8),
       radius,
-      label: 'ENTER',
+      label: 'OPEN',
       title: label,
       kind: 'door',
-      scope: 'world',
       dir: out.clone(),
       dirCos: 0.42,
-      look: rt.doorLook,
+      look: place.doorLook,
       priority: 2,
-      onUse: () => enterBuilding(id),
+      onUse: () => openPage(id),
     })
     return () => {
       off()
-      delete buildings[id]
+      delete places[id]
     }
-  }, [id, label, color, frame, doorZ, doorX, lookY, radius])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, label, color, frame, doorZ, doorX, lookY, radius, dist, pitch, yaw])
 }
 
 // ---- a few reusable bits -----------------------------------------------------------------------------------

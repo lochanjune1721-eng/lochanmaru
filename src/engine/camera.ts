@@ -1,23 +1,27 @@
-// Camera director. Modes: intro orbit -> flight -> follow (world) / follow (interior). Everything is
-// exponentially damped so the camera never feels robotic, and it never clips through buildings.
+// Camera director. Modes: intro orbit -> flight -> follow. While a building's page is open the follow pose is blended
+// into a three-quarter view of that building. Everything is exponentially damped so the camera never feels robotic,
+// and it never clips through buildings.
 import { PerspectiveCamera, Vector2, Vector3 } from 'three'
 import { clamp, damp, easeInOutCubic, lerp, DEG } from './math'
 import { game } from './game'
 import { consumeLook, consumeWheel, input } from './input'
 import { R, mapToN, toTangent } from './planet'
 import { worldColliders } from './collision'
+import type { Place } from './places'
 import { cam, player } from './state'
 import { walkTerrain } from '../world/terrain'
 import { store } from './store'
 
 const _look = new Vector2()
 const _pos = new Vector3()
+const _bp = new Vector3()
 const _tgt = new Vector3()
 const _right = new Vector3()
 const _des = new Vector3()
 const _tmp = new Vector3()
 const _dirA = new Vector3()
 const _dirB = new Vector3()
+const _out = new Vector3()
 
 export const debugPose = { on: false, pos: new Vector3(), look: new Vector3(), up: new Vector3(0, 1, 0), fov: 38 }
 
@@ -31,7 +35,32 @@ export const flight = {
 const INTRO_FOV = 33
 
 /** smoothed camera scalars (NaN = uninitialised, snap on first use) */
-const sm = { dist: NaN, pitch: NaN, shift: 0 }
+const sm = { dist: NaN, pitch: NaN }
+
+/** the smoothed pose of the page view (so hopping between buildings glides instead of jumping) */
+const pp = { pos: new Vector3(), look: new Vector3(), up: new Vector3(0, 1, 0), ready: false }
+
+/** Width the open page covers on desktop (matches the CSS clamp), in px. */
+export const pageCoverPx = () => Math.min(720, Math.max(440, 0.46 * window.innerWidth)) + 14
+
+/** Spherical interpolation of two points around the planet centre (direction slerped, radius lerped). */
+function slerpPoint(a: Vector3, b: Vector3, e: number, out: Vector3) {
+  const ra = a.length()
+  const rb = b.length()
+  _dirA.copy(a).multiplyScalar(1 / Math.max(ra, 1e-6))
+  _dirB.copy(b).multiplyScalar(1 / Math.max(rb, 1e-6))
+  const ang = Math.acos(clamp(_dirA.dot(_dirB), -1, 1))
+  const r = lerp(ra, rb, e)
+  if (ang < 1e-4) {
+    out.copy(_dirB).multiplyScalar(r)
+    return out
+  }
+  const s = Math.sin(ang)
+  const wa = Math.sin((1 - e) * ang) / s
+  const wb = Math.sin(e * ang) / s
+  out.set(0, 0, 0).addScaledVector(_dirA, wa).addScaledVector(_dirB, wb).normalize().multiplyScalar(r)
+  return out
+}
 
 /** Pose of the intro orbit (a beautiful establishing shot of the tiny planet). */
 export function introPose(time: number, pos: Vector3, look: Vector3, up: Vector3) {
@@ -52,18 +81,34 @@ export function introPose(time: number, pos: Vector3, look: Vector3, up: Vector3
   up.set(0, 1, 0)
 }
 
+/** Pull a desired camera position in towards its look point until nothing solid is in the way, and keep it off the ground. */
+function boom(look: Vector3, des: Vector3) {
+  for (let i = 0; i < 8; i++) {
+    const t = 1 - i * 0.1
+    _bp.copy(look).lerp(des, t)
+    const h = _bp.length() - R
+    if (!worldColliders.blocks(_bp, 0.9, h - 0.3)) {
+      if (i > 0) des.copy(_bp)
+      break
+    }
+    if (i === 7) des.copy(_bp)
+  }
+  const r = des.length()
+  const n = _tmp.copy(des).normalize()
+  const minR = R + walkTerrain(n) + 1.1
+  if (r < minR) des.multiplyScalar(minR / r)
+}
+
 function followPose(dt: number, pos: Vector3, look: Vector3, up: Vector3, hardSnap = false) {
-  const interior = game.mode === 'interior'
   up.copy(player.up)
 
   // --- user look (drag) + zoom ---
-  const panelOpen = !!store.getState().panel
-  if (input.enabled && !panelOpen) {
+  if (input.enabled && !store.getState().page) {
     consumeLook(_look)
     if (_look.lengthSq() > 0) {
       const sens = input.touch ? 0.0062 : 0.0052
       cam.fwd.applyAxisAngle(up, _look.x * sens)
-      cam.pitch = clamp(cam.pitch + _look.y * sens * 0.8, interior ? 0.5 : 0.2, interior ? 0.95 : 1.15)
+      cam.pitch = clamp(cam.pitch + _look.y * sens * 0.8, 0.2, 1.15)
     }
     const w = consumeWheel()
     if (w) cam.zoom = clamp(cam.zoom + w * 0.0012, 0.62, 1.55)
@@ -71,81 +116,49 @@ function followPose(dt: number, pos: Vector3, look: Vector3, up: Vector3, hardSn
     consumeLook(_look)
     consumeWheel()
   }
-  if (interior) {
-    // keep the interior camera within a comfortable arc around "looking at the back wall"
-    const base = _tmp.set(0, 0, -1)
-    const ang = Math.atan2(cam.fwd.x * base.z - cam.fwd.z * base.x, cam.fwd.x * base.x + cam.fwd.z * base.z)
-    const lim = 0.62
-    if (Math.abs(ang) > lim) cam.fwd.applyAxisAngle(up, -(ang - Math.sign(ang) * lim))
-  }
   toTangent(cam.fwd, up)
 
-  // --- focus point ---
+  // --- focus point: a little ahead of the walker ---
   const ahead = clamp(player.speed * 0.16, 0, 1.6)
   _tgt.copy(player.pos).addScaledVector(up, 1.15).addScaledVector(player.velDir, ahead)
-  if (interior) _tgt.addScaledVector(cam.fwd, 3.2)
-  // interaction focus: lean towards a target point
-  if (cam.focusTarget) {
-    cam.focusAmt = damp(cam.focusAmt, 1, 3.2, dt)
-  } else {
-    cam.focusAmt = damp(cam.focusAmt, 0, 3.2, dt)
-  }
-  if (cam.focusTarget && cam.focusAmt > 0.001) {
-    _tmp.copy(cam.focusTarget)
-    _tgt.lerp(_tmp, cam.focusAmt * 0.55)
-  }
   if (hardSnap) cam.focus.copy(_tgt)
-  else {
-    const k = 1 - Math.exp(-9 * dt)
-    cam.focus.lerp(_tgt, k)
-  }
+  else cam.focus.lerp(_tgt, 1 - Math.exp(-9 * dt))
 
   // --- distance / pitch ---
-  const baseDist = (interior ? 17.5 : 13.6) * cam.zoom
-  const sprintBonus = player.sprint ? 1.3 : 0
-  const focusDist = cam.focusTarget ? lerp(baseDist, cam.focusDist, cam.focusAmt) : baseDist
-  const wantDist = focusDist + sprintBonus
-  const wantPitch = cam.focusTarget ? lerp(cam.pitch, cam.focusPitch, cam.focusAmt) : cam.pitch
+  const wantDist = 13.6 * cam.zoom + (player.sprint ? 1.3 : 0)
   sm.dist = hardSnap || Number.isNaN(sm.dist) ? wantDist : damp(sm.dist, wantDist, 3.5, dt)
-  sm.pitch = hardSnap || Number.isNaN(sm.pitch) ? wantPitch : damp(sm.pitch, wantPitch, 4, dt)
-  const dist = sm.dist
-  const pitch = sm.pitch
-
-  // --- panel shift: keep the subject visible next to a content panel ---
-  const mobile = window.innerWidth < 760
-  sm.shift = damp(sm.shift, panelOpen ? 1 : 0, 4, dt)
-  const shift = sm.shift
+  sm.pitch = hardSnap || Number.isNaN(sm.pitch) ? cam.pitch : damp(sm.pitch, cam.pitch, 4, dt)
 
   look.copy(cam.focus)
-  _right.crossVectors(cam.fwd, up).normalize()
-  // centre the subject in the part of the screen the panel leaves free (panel = 480px + margin on desktop,
-  // ~78% of the height on phones): world shift = (covered fraction) * tan(fov/2) * distance
-  const halfH = Math.tan((cam.fov * Math.PI) / 360) * dist
-  if (!mobile) look.addScaledVector(_right, shift * (Math.min(494, window.innerWidth * 0.5) / window.innerHeight) * halfH)
-  else look.addScaledVector(up, -shift * 0.68 * halfH)
+  _des.copy(look).addScaledVector(up, Math.sin(sm.pitch) * sm.dist).addScaledVector(cam.fwd, -Math.cos(sm.pitch) * sm.dist)
+  boom(look, _des)
+  pos.copy(_des)
+}
 
-  _des.copy(look).addScaledVector(up, Math.sin(pitch) * dist).addScaledVector(cam.fwd, -Math.cos(pitch) * dist)
+/**
+ * Where the camera sits to show a building next to its open page: in front of it and a little round to one side,
+ * looking slightly above centre, with the building nudged into the part of the screen the page leaves free.
+ */
+function placeTarget(p: Place, pos: Vector3, look: Vector3, up: Vector3) {
+  const f = p.frame
+  const W = window.innerWidth
+  const H = window.innerHeight
+  const mobile = W < 760
+  const aspect = W / H
+  const free = mobile ? 1 : Math.max(0.3, 1 - pageCoverPx() / W)
+  // the framing distances are designed for a 16:9 window with roughly half of it free
+  const D = p.dist * clamp((1.78 * 0.53) / (aspect * free), 0.85, 2.3)
+  const halfH = Math.tan((cam.fov * Math.PI) / 360) * D
 
-  // --- boom: don't go through buildings ---
-  if (!interior) {
-    for (let i = 0; i < 8; i++) {
-      const t = 1 - i * 0.1
-      _pos.copy(look).lerp(_des, t)
-      const h = _pos.length() - R
-      if (!worldColliders.blocks(_pos, 0.9, h - 0.3)) {
-        if (i > 0) _des.copy(_pos)
-        break
-      }
-      if (i === 7) _des.copy(_pos)
-    }
-    // stay above the ground
-    const r = _des.length()
-    const n = _tmp.copy(_des).normalize()
-    const minR = R + walkTerrain(n) + 1.1
-    if (r < minR) _des.multiplyScalar(minR / r)
-  } else {
-    if (_des.y < look.y + 1.5) _des.y = look.y + 1.5
-  }
+  up.copy(f.n)
+  // direction from the building towards the camera
+  _out.copy(f.fwd).multiplyScalar(Math.cos(p.yaw)).addScaledVector(f.x, Math.sin(p.yaw)).normalize()
+  _right.crossVectors(_tmp.copy(_out).negate(), up).normalize()
+  look.copy(p.focus)
+  if (!mobile) look.addScaledVector(_right, (pageCoverPx() / H) * halfH)
+  else look.addScaledVector(up, -0.62 * halfH)
+  _des.copy(look).addScaledVector(up, Math.sin(p.pitch) * D).addScaledVector(_out, Math.cos(p.pitch) * D)
+  boom(look, _des)
   pos.copy(_des)
 }
 
@@ -166,6 +179,7 @@ export function updateCamera(camera: PerspectiveCamera, dt: number) {
   time += dt
   const pose = { pos: _pos, look: new Vector3(), up: new Vector3() }
   let fov = cam.fov
+  let placeE = 0
 
   if (cam.mode === 'intro') {
     introPose(time, pose.pos, pose.look, pose.up)
@@ -178,18 +192,7 @@ export function updateCamera(camera: PerspectiveCamera, dt: number) {
     const toLook = new Vector3()
     const toUp = new Vector3()
     followPose(dt, toPos, toLook, toUp, true)
-    // spherical interpolation of the camera position around the planet centre
-    _dirA.copy(flight.fromPos).normalize()
-    _dirB.copy(toPos).normalize()
-    const ang = Math.acos(clamp(_dirA.dot(_dirB), -1, 1))
-    if (ang < 1e-4) pose.pos.copy(toPos)
-    else {
-      const s = Math.sin(ang)
-      const wa = Math.sin((1 - e) * ang) / s
-      const wb = Math.sin(e * ang) / s
-      pose.pos.set(0, 0, 0).addScaledVector(_dirA, wa).addScaledVector(_dirB, wb).normalize()
-      pose.pos.multiplyScalar(lerp(flight.fromPos.length(), toPos.length(), e))
-    }
+    slerpPoint(flight.fromPos, toPos, e, pose.pos)
     pose.look.lerpVectors(flight.fromLook, toLook, e)
     pose.up.lerpVectors(flight.fromUp, toUp, e).normalize()
     fov = lerp(INTRO_FOV, cam.fov, e)
@@ -198,6 +201,34 @@ export function updateCamera(camera: PerspectiveCamera, dt: number) {
     followPose(dt, pose.pos, pose.look, pose.up)
     // subtle FOV breathing when sprinting
     fov = cam.fov + (player.sprint ? 3 : 0)
+
+    // --- a building's page is open (or closing): blend towards the page view ---
+    const want = store.getState().page && cam.place ? 1 : 0
+    cam.placeAmt = damp(cam.placeAmt, want, 2.6, dt)
+    if (cam.place && (want || cam.placeAmt > 0.002)) {
+      const toPos = new Vector3()
+      const toLook = new Vector3()
+      const toUp = new Vector3()
+      placeTarget(cam.place, toPos, toLook, toUp)
+      if (!pp.ready) {
+        pp.pos.copy(toPos)
+        pp.look.copy(toLook)
+        pp.up.copy(toUp)
+        pp.ready = true
+      } else {
+        const k = 1 - Math.exp(-3.4 * dt)
+        slerpPoint(pp.pos, toPos, k, pp.pos)
+        slerpPoint(pp.look, toLook, k, pp.look)
+        pp.up.lerp(toUp, k).normalize()
+      }
+      placeE = easeInOutCubic(clamp(cam.placeAmt, 0, 1))
+      slerpPoint(pose.pos, pp.pos, placeE, pose.pos)
+      slerpPoint(pose.look, pp.look, placeE, pose.look)
+      pose.up.lerp(pp.up, placeE).normalize()
+    } else if (!want) {
+      pp.ready = false
+      cam.place = null
+    }
   }
 
   camera.position.copy(pose.pos)
@@ -214,16 +245,16 @@ export function updateCamera(camera: PerspectiveCamera, dt: number) {
   }
   // export for lights / sky / culling
   game.camPos.copy(camera.position)
-  if (game.mode === 'world') {
-    const focusN = cam.mode === 'intro' ? _tmp.copy(mapToN(0, -12)) : _tmp.copy(player.n)
-    game.focusN.copy(focusN)
-    game.up.copy(cam.mode === 'intro' ? focusN : player.up)
-    game.focus.copy(cam.mode === 'intro' ? _tmp.multiplyScalar(R) : player.pos)
-  } else {
-    game.up.set(0, 1, 0)
-    game.focusN.set(0, 1, 0)
-    game.focus.copy(player.pos)
+  const intro = cam.mode === 'intro'
+  const focusN = intro ? _tmp.copy(mapToN(0, -12)) : _tmp.copy(player.n)
+  const focusW = intro ? _out.copy(focusN).multiplyScalar(R) : _out.copy(player.pos)
+  if (placeE > 0 && cam.place) {
+    focusN.lerp(cam.place.frame.n, placeE).normalize()
+    focusW.lerp(cam.place.focus, placeE)
   }
+  game.focusN.copy(focusN)
+  game.up.copy(intro ? focusN : placeE > 0 ? focusN : player.up)
+  game.focus.copy(focusW)
 }
 
 export function beginFlight(camera: PerspectiveCamera) {
@@ -238,7 +269,6 @@ export function beginFlight(camera: PerspectiveCamera) {
 export function resetFollowSmoothing() {
   sm.dist = NaN
   sm.pitch = NaN
-  sm.shift = 0
 }
 
 export { DEG }
