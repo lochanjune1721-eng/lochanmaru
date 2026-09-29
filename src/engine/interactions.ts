@@ -4,7 +4,7 @@ import { bus } from './bus'
 import { game } from './game'
 import { input } from './input'
 import { findNearest, Interactable } from './interact'
-import { cam, player } from './state'
+import { player } from './state'
 import { store } from './store'
 
 const _p = new Vector3()

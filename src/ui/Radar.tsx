@@ -4,7 +4,7 @@ import { game } from '../engine/game'
 import { R, mapToN } from '../engine/planet'
 import { cam, player } from '../engine/state'
 import { store } from '../engine/store'
-import { POI_LIST, POIS } from '../world/layout'
+import { POI_LIST } from '../world/layout'
 
 const COLORS: Record<string, string> = { home: '#f2a33c', experience: '#2f9591', work: '#e2493f', results: '#3e4392', hire: '#ff5a6a' }
 const GLYPH: Record<string, string> = { home: '?', experience: 'E', work: 'W', results: 'R', hire: '♥' }
@@ -107,4 +107,3 @@ export function Radar() {
   )
 }
 
-void POIS

@@ -13,7 +13,6 @@ import { store } from './store'
 const _look = new Vector2()
 const _pos = new Vector3()
 const _tgt = new Vector3()
-const _up = new Vector3()
 const _right = new Vector3()
 const _des = new Vector3()
 const _tmp = new Vector3()

@@ -2,12 +2,11 @@
 // sweeps across the whole planet, with a keeper's cottage, a neon sign, a mailbox and a pier.
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
-import { AdditiveBlending, Color, ConeGeometry, DoubleSide, Group, Mesh, ShaderMaterial, Vector3 } from 'three'
+import { AdditiveBlending, Color, ConeGeometry, DoubleSide, Group, ShaderMaterial, Vector3 } from 'three'
 import { contactPanel } from '../../content/panels'
 import { register } from '../../engine/interact'
 import { game } from '../../engine/game'
 import { showPanel } from '../../engine/panel'
-import { R } from '../../engine/planet'
 import { store } from '../../engine/store'
 import { GeoBuilder } from '../../gfx/geo'
 import { glowSpriteMaterial, worldMaterial } from '../../gfx/materials'
@@ -279,7 +278,4 @@ export function Hire() {
   )
 }
 
-void Mesh
-void R
 void Vector3
-void SignBoard

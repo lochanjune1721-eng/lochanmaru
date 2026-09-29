@@ -16,7 +16,7 @@ import { P } from '../gfx/palette'
 import { FONT, makeCanvas, roundRect, signTexture, toTexture, wrapLines } from '../gfx/text'
 import { Bulbs } from '../world/buildings/led'
 import { SignBoard } from '../world/buildings/parts'
-import { beamGeometry, makeBeamMaterial, Motes, ringPos, roundRoom, useImage, useRingWall } from './fx'
+import { beamGeometry, makeBeamMaterial, Motes, roundRoom, useImage, useRingWall } from './fx'
 import { Hotspot, Interior, interiorOrigin, useBox, useCircle, useOpen } from './kit'
 import { plant } from './parts'
 
@@ -679,4 +679,3 @@ export function WorkRoom() {
   )
 }
 
-void ringPos

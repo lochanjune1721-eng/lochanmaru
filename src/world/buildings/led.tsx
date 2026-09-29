@@ -96,5 +96,6 @@ export function Bulbs({ points, size = 0.11, speed = 5, colorA = '#ffe3a1', colo
     }
     if (m.instanceColor) m.instanceColor.needsUpdate = true
   })
-  return <instancedMesh ref={ref} args={[geo, mat, points.length]} frustumCulled />
+  // the bulbs are placed after mount, so a bounding sphere computed earlier would wrongly cull them
+  return <instancedMesh ref={ref} args={[geo, mat, points.length]} frustumCulled={false} />
 }

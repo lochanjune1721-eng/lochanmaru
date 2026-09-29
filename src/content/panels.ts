@@ -17,7 +17,7 @@ export function projectPanel(p: Project): PanelContent {
   if (p.source === 'brief') {
     // Named in the brief, but the write-up isn't on hand — never invent one.
     blocks.push({ t: 'lead', text: `Want the story behind ${p.name}?` })
-    blocks.push({ t: 'p', text: 'This one is best told in conversation — ask, and you’ll get the real numbers and the thinking behind them.' })
+    blocks.push({ t: 'p', text: 'This one is best told in conversation. Ask, and you’ll hear the story straight from Lochan.' })
     blocks.push({
       t: 'links',
       items: [

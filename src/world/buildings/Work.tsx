@@ -19,7 +19,6 @@ import { ribbon } from '../ribbon'
 import { Bulbs, LedScreen } from './led'
 import { Door, SignBoard, useBuildingDoor } from './parts'
 import { addBench, addLamp, addPlanter, V3 } from '../props'
-import { Forecourt } from './Forecourt'
 
 const FRONT = 8.1
 const W = 20
@@ -430,5 +429,3 @@ export function Work() {
   )
 }
 
-void Forecourt
-void roundRect
