@@ -11,9 +11,11 @@ export interface Quality {
   birds: number
   butterflies: number
   mobile: boolean
+  /** the visitor asked the OS for less motion */
+  reduced: boolean
 }
 
-const TABLE: Record<0 | 1 | 2, Omit<Quality, 'mobile'>> = {
+const TABLE: Record<0 | 1 | 2, Omit<Quality, 'mobile' | 'reduced'>> = {
   0: { tier: 0, dpr: 1.25, shadowMap: 1024, shadows: true, planetDetail: 40, scatter: 0.5, antialias: false, cloudGroups: 2, birds: 12, butterflies: 8 },
   1: { tier: 1, dpr: 1.6, shadowMap: 1536, shadows: true, planetDetail: 52, scatter: 0.8, antialias: true, cloudGroups: 3, birds: 20, butterflies: 14 },
   2: { tier: 2, dpr: 2, shadowMap: 2048, shadows: true, planetDetail: 64, scatter: 1, antialias: true, cloudGroups: 4, birds: 28, butterflies: 20 },
@@ -29,10 +31,11 @@ export function detectQuality(): Quality {
   else if (cores <= 2 || (mem !== undefined && mem <= 2)) tier = 1
   const forced = new URLSearchParams(location.search).get('q')
   if (forced === '0' || forced === '1' || forced === '2') tier = Number(forced) as 0 | 1 | 2
-  return { ...TABLE[tier], mobile }
+  const reduced = !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  return { ...TABLE[tier], mobile, reduced }
 }
 
-export const quality: Quality = typeof window !== 'undefined' ? detectQuality() : { ...TABLE[2], mobile: false }
+export const quality: Quality = typeof window !== 'undefined' ? detectQuality() : { ...TABLE[2], mobile: false, reduced: false }
 
 export function setTier(t: 0 | 1 | 2) {
   Object.assign(quality, TABLE[t])

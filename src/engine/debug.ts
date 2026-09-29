@@ -35,13 +35,11 @@ export function installDebug(camera: PerspectiveCamera) {
       if (yawDeg !== undefined) {
         const north = new Vector3()
         const east = new Vector3()
-        import('./planet').then(({ mapBasisAt }) => {
-          mapBasisAt(n, north, east)
-          const a = (yawDeg * Math.PI) / 180
-          player.heading.copy(north).multiplyScalar(Math.cos(a)).addScaledVector(east, Math.sin(a)).normalize()
-          player.velDir.copy(player.heading)
-          cam.fwd.copy(player.heading)
-        })
+        mapBasisAt(n, north, east)
+        const a = (yawDeg * Math.PI) / 180
+        player.heading.copy(north).multiplyScalar(Math.cos(a)).addScaledVector(east, Math.sin(a)).normalize()
+        player.velDir.copy(player.heading)
+        cam.fwd.copy(player.heading)
       }
       resetFollowSmoothing()
     },

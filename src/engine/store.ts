@@ -49,6 +49,8 @@ interface State {
   nearPoi: InteriorId | null
   helpOpen: boolean
   textOpen: boolean
+  /** bumps whenever an interior object is used (so the HUD can recount progress) */
+  seenTick: number
 
   set: (p: Partial<State>) => void
   setProgress: (p: number, label?: string) => void
@@ -70,6 +72,26 @@ const savedAudio = (() => {
   }
 })()
 
+// The little bit of progress worth remembering between visits: which places and secrets have been found.
+const saved = (() => {
+  try {
+    const j = JSON.parse(localStorage.getItem('lw:save') || '{}')
+    return {
+      visited: (j.visited && typeof j.visited === 'object' ? j.visited : {}) as Partial<Record<InteriorId, boolean>>,
+      secrets: (Array.isArray(j.secrets) ? j.secrets.filter((x: unknown) => typeof x === 'string') : []) as string[],
+    }
+  } catch {
+    return { visited: {}, secrets: [] as string[] }
+  }
+})()
+const persist = (visited: State['visited'], secrets: string[]) => {
+  try {
+    localStorage.setItem('lw:save', JSON.stringify({ visited, secrets }))
+  } catch {
+    /* private mode etc. */
+  }
+}
+
 export const useStore = create<State>((set, get) => ({
   phase: 'loading',
   loadProgress: 0,
@@ -77,8 +99,8 @@ export const useStore = create<State>((set, get) => ({
   interior: null,
   prompt: null,
   panel: null,
-  visited: {},
-  secrets: [],
+  visited: saved.visited,
+  secrets: saved.secrets,
   audioOn: savedAudio,
   touch: typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches,
   toast: null,
@@ -86,15 +108,22 @@ export const useStore = create<State>((set, get) => ({
   nearPoi: null,
   helpOpen: false,
   textOpen: false,
+  seenTick: 0,
 
   set: (p) => set(p),
   setProgress: (p, label) => set({ loadProgress: Math.max(get().loadProgress, p), ...(label ? { loadLabel: label } : {}) }),
   markVisited: (id) => {
-    if (!get().visited[id]) set({ visited: { ...get().visited, [id]: true } })
+    if (!get().visited[id]) {
+      const visited = { ...get().visited, [id]: true }
+      set({ visited })
+      persist(visited, get().secrets)
+    }
   },
   addSecret: (id) => {
     if (get().secrets.includes(id)) return false
-    set({ secrets: [...get().secrets, id] })
+    const secrets = [...get().secrets, id]
+    set({ secrets })
+    persist(get().visited, secrets)
     return true
   },
   showToast: (text, kind = 'info') => {

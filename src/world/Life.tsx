@@ -120,7 +120,7 @@ const _r = new Vector3()
 const _m = new Matrix4()
 
 function Birds() {
-  const N = quality.birds
+  const N = quality.reduced ? 0 : quality.birds
   const { mesh, orbits } = useMemo(() => {
     const r = rng(4242)
     const geo = birdGeometry()
@@ -193,7 +193,7 @@ const flyFrag = /* glsl */ `
   void main(){ gl_FragColor = vec4(mix(vCol, uFog, vFog), 1.0); }`
 
 function Butterflies() {
-  const N = quality.butterflies
+  const N = quality.reduced ? 0 : quality.butterflies
   const { mesh, homes } = useMemo(() => {
     const r = rng(9911)
     // each wing is a little fan (upper lobe + lower lobe) hinged on the body line

@@ -10,7 +10,6 @@ export const SECRETS = [
   'cactus',
   'robot',
   'typewriter',
-  'reel',
   'counter',
   // interiors
   'lever',

@@ -3,6 +3,7 @@ import { SECRETS } from '../content/secrets'
 import { audio } from '../engine/audio'
 import { InteriorId, useStore } from '../engine/store'
 import { input } from '../engine/input'
+import { roomProgress } from '../interiors/kit'
 
 const PLACES: InteriorId[] = ['home', 'experience', 'work', 'results', 'hire']
 
@@ -30,6 +31,8 @@ export function Hud() {
   const touch = useStore((s) => s.touch)
   const panel = useStore((s) => s.panel)
   const set = useStore((s) => s.set)
+  const room = useStore((s) => s.interior)
+  useStore((s) => s.seenTick)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -49,6 +52,7 @@ export function Hud() {
     return () => clearInterval(t)
   }, [hint, set])
 
+  const prog = room ? roomProgress(room) : { done: 0, total: 0 }
   if (phase === 'loading' || phase === 'starting') return null
   const n = PLACES.filter((p) => visited[p]).length
   return (
@@ -62,6 +66,7 @@ export function Hud() {
                 <i key={p} className={visited[p] ? 'on' : ''} />
               ))}
               {secrets.length > 0 && <b>✦ {secrets.length}/{SECRETS.length}</b>}
+              {room && prog.total > 2 && <em className="prog">{prog.done}/{prog.total} explored</em>}
             </div>
           </div>
           {hint === 'controls' && !panel && (

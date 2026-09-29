@@ -26,6 +26,7 @@ import { Planet } from './Planet'
 import { Plaza } from './Plaza'
 import { Scatter } from './Scatter'
 import { Sky } from './Sky'
+import { Visitors } from './Visitors'
 import { HomeRoom } from '../interiors/HomeRoom'
 import { ExperienceRoom } from '../interiors/ExperienceRoom'
 import { WorkRoom } from '../interiors/WorkRoom'
@@ -74,6 +75,7 @@ export function World() {
         <Scatter />
         <Dressing />
         <Life />
+        <Visitors />
         <Home />
         <Experience />
         <Work />

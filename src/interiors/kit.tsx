@@ -7,7 +7,7 @@ import { game } from '../engine/game'
 import { showPanel } from '../engine/panel'
 import type { PanelContent } from '../engine/store'
 import { ColliderSet } from '../engine/collision'
-import { register } from '../engine/interact'
+import { register, registry } from '../engine/interact'
 import { exitBuilding, stage } from '../engine/scenes'
 import { InteriorRuntime } from '../engine/state'
 import { InteriorId, store } from '../engine/store'
@@ -100,6 +100,18 @@ export function useCircle(x: number, z: number, r: number, h = 3) {
 const seen = new Set<string>()
 export const hasSeen = (id: string) => seen.has(id)
 
+/** How many of a room's objects (not secrets, not the exit) the visitor has used so far. */
+export function roomProgress(room: string) {
+  let total = 0
+  let done = 0
+  for (const i of registry) {
+    if (i.scope !== room || i.kind === 'secret' || i.id.endsWith(':exit')) continue
+    total++
+    if (seen.has(i.id)) done++
+  }
+  return { done, total }
+}
+
 let starTex: CanvasTexture | null = null
 function starTexture() {
   if (starTex) return starTex
@@ -172,6 +184,7 @@ export function Hotspot({ id, x, y = 1.4, z, radius = 2.8, label, title, kind = 
   })
   const use = () => {
     seen.add(key)
+    store.setState((st) => ({ seenTick: st.seenTick + 1 }))
     onUse()
   }
   useEffect(() => {

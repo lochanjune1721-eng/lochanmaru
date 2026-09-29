@@ -9,6 +9,7 @@ import { stage } from './scenes'
 import { store } from './store'
 import { audio } from './audio'
 import { after } from './sim'
+import { quality } from './quality'
 
 export function startJourney() {
   const st = store.getState()
@@ -20,11 +21,12 @@ export function startJourney() {
   player.frozen = true
   player.visible = false
   player.drop = -1
+  cam.flightDur = quality.reduced ? 0.9 : 3.4
   beginFlight(camera)
   bus.emit('start')
-  after(1.7, () => {
+  after(quality.reduced ? 0.4 : 1.7, () => {
     player.visible = true
-    player.drop = 0
+    player.drop = quality.reduced ? -1 : 0
   })
   after(cam.flightDur + 0.1, () => {
     store.getState().set({ phase: 'playing', hint: 'controls' })

@@ -8,6 +8,7 @@ import { store } from './engine/store'
 import { P } from './gfx/palette'
 import { loadFonts } from './gfx/text'
 import { LoadCoordinator } from './play/LoadCoordinator'
+import { PerfGovernor } from './play/PerfGovernor'
 import { Controls } from './ui/Controls'
 import { Fallback } from './ui/Fallback'
 import { Overlay } from './ui/Overlay'
@@ -57,6 +58,7 @@ export default function App() {
           <>
             <World />
             <LoadCoordinator />
+            <PerfGovernor />
           </>
         )}
       </Canvas>

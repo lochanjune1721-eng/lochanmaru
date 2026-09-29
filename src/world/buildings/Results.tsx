@@ -16,7 +16,7 @@ import { Placed, boxCollider, circleCollider, makeFrame } from '../place'
 import { addBench, addLamp, addPlanter, V3 } from '../props'
 import { LedScreen } from './led'
 import { Door, SignBoard, useBuildingDoor } from './parts'
-import { easeOutCubic, damp } from '../../engine/math'
+import { damp } from '../../engine/math'
 
 const BASE_R = 6.4
 const BASE_H = 5.6
@@ -170,7 +170,7 @@ export function Results() {
   const panelDraw = useMemo(
     () =>
       PANELS.map((p) => (g: CanvasRenderingContext2D, t: number, w: number, h: number) => {
-        const k = easeOutCubic(Math.min(1, wake.current))
+        const k = 1 // the crown always shows the final figures (far-away screens never redraw, so no half-counted numbers)
         const grd = g.createLinearGradient(0, 0, w, h)
         grd.addColorStop(0, '#1b1838')
         grd.addColorStop(1, '#3e4392')

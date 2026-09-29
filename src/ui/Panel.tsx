@@ -115,6 +115,7 @@ export function Panel() {
   const [shown, setShown] = useState<PanelContent | null>(null)
   const [open, setOpen] = useState(false)
   const body = useRef<HTMLDivElement>(null)
+  const closeBtn = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (panel) {
@@ -127,6 +128,10 @@ export function Panel() {
     const t = setTimeout(() => setShown(null), 650)
     return () => clearTimeout(t)
   }, [panel])
+
+  useEffect(() => {
+    if (open) closeBtn.current?.focus({ preventScroll: true })
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -147,7 +152,7 @@ export function Panel() {
           <h2>{shown.title}</h2>
           {shown.subtitle && <div className="subt">{shown.subtitle}</div>}
           {shown.image && <img className="logo" src={shown.image.src} alt={shown.image.alt} />}
-          <button className="panel-x" onClick={hidePanel} aria-label="Close">
+          <button ref={closeBtn} className="panel-x" onClick={hidePanel} aria-label="Close">
             <svg viewBox="0 0 16 16">
               <path d="M3 3l10 10M13 3L3 13" />
             </svg>
