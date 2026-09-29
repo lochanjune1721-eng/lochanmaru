@@ -32,7 +32,7 @@ export function Hero({
   children?: ReactNode
   small?: boolean
 }) {
-  const style = accent ? vars({ '--accent': accent, '--on': isLight(accent) ? '#2b2438' : '#fff8ea' }) : undefined
+  const style = accent ? vars({ '--accent': accent, '--on': isLight(accent) ? '#2b2438' : '#fff8ea', '--tint': tintOf(accent) }) : undefined
   return (
     <header className={`pg-hero ${small ? 'small' : ''}`} style={style}>
       <div className="pg-orb" aria-hidden>
@@ -44,6 +44,30 @@ export function Hero({
       {children}
     </header>
   )
+}
+
+/** a pastel wash of the same hue as `hex` (for the top of a chapter / case-study page) */
+export function tintOf(hex: string) {
+  const h = hex.replace('#', '')
+  const n = parseInt(h.length === 3 ? h.replace(/./g, '$&$&') : h, 16)
+  const r = ((n >> 16) & 255) / 255
+  const g = ((n >> 8) & 255) / 255
+  const b = (n & 255) / 255
+  const mx = Math.max(r, g, b)
+  const mn = Math.min(r, g, b)
+  const l = (mx + mn) / 2
+  const d = mx - mn
+  let hue = 0
+  if (d > 0) {
+    if (mx === r) hue = ((g - b) / d) % 6
+    else if (mx === g) hue = (b - r) / d + 2
+    else hue = (r - g) / d + 4
+    hue *= 60
+    if (hue < 0) hue += 360
+  }
+  const sat = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1))
+  const s = Math.min(72, Math.max(10, sat * 100 * 1.1))
+  return `hsl(${Math.round(hue)} ${Math.round(s)}% 86%)`
 }
 
 /** rough perceived-lightness test so text on a chapter/wing colour stays readable */

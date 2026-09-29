@@ -44,7 +44,7 @@
 @keyframes rv { from { opacity: 0; transform: translateY(16px); } }
 
 /* ---------- hero ---------- */
-.pg-hero { position: relative; overflow: hidden; padding: 30px 30px 26px; border-bottom: 2px solid var(--ink); background: color-mix(in srgb, var(--accent) 26%, var(--paper)); }
+.pg-hero { position: relative; overflow: hidden; padding: 30px 30px 26px; border-bottom: 2px solid var(--ink); background: var(--tint, #f6e2bd); }
 .pg-hero::before { content: ''; position: absolute; right: -80px; top: -110px; width: 320px; height: 320px; border-radius: 50%; background: var(--accent); opacity: 0.2; pointer-events: none; }
 .pg-hero::after { content: ''; position: absolute; right: -34px; bottom: -64px; width: 130px; height: 130px; border-radius: 50%; border: 2px dashed color-mix(in srgb, var(--ink) 35%, transparent); pointer-events: none; }
 .pg-orb { position: absolute; z-index: 1; right: 28px; top: 26px; width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; overflow: hidden; background: var(--accent); color: var(--on); border: 2.5px solid var(--ink); box-shadow: 0 4px 0 var(--ink); transform: rotate(-7deg); animation: orb 0.8s 0.2s cubic-bezier(0.2, 1.6, 0.4, 1) backwards; }
@@ -260,7 +260,7 @@
   .pg-hero h1 { padding-right: 70px; font-size: clamp(32px, 9.5vw, 44px); }
   .pg-hero.small h1 { font-size: clamp(27px, 8vw, 36px); }
   .pg-sub { padding-right: 60px; font-size: 16px; }
-  .pg-main { padding: 20px 18px 28px; gap: 22px; }
+  .pg-main { padding: 20px 18px calc(28px + var(--safe-b)); gap: 22px; }
   .pg-backbar { padding: 8px 18px; }
   .pg-glance { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .pg-glance span { font-size: 9.5px; }

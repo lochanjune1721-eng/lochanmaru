@@ -102,7 +102,7 @@ export function Pages() {
       ref={dlg}
       tabIndex={-1}
       className={`pg ${open ? 'show' : ''} ${tall ? 'tall' : ''}`}
-      style={vars({ '--accent': meta.color, '--on': meta.on })}
+      style={vars({ '--accent': meta.color, '--on': meta.on, '--tint': meta.tint })}
       role="dialog"
       aria-modal="false"
       aria-label={meta.label}

@@ -25,7 +25,7 @@ export function Intro() {
   if (phase === 'loading') return null
   const out = phase !== 'intro'
   return (
-    <div className={`intro ${out ? 'out' : ''}`}>
+    <div className={`intro ${out ? 'out' : ''}`} inert={out || undefined} aria-hidden={out || undefined}>
       <div className="kicker">{SITE.name} · a tiny world</div>
       <h1>
         WHO AM I<em>?</em>

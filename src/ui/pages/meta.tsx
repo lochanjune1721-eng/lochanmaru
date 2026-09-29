@@ -9,14 +9,16 @@ export interface PageMeta {
   color: string
   /** text colour that reads on `color` */
   on: string
+  /** pastel wash behind the page's hero */
+  tint: string
 }
 
 export const PAGES: PageMeta[] = [
-  { id: 'home', label: 'WHO AM I', name: 'Who am I', color: '#f2a33c', on: '#2b2438' },
-  { id: 'experience', label: 'EXPERIENCE', name: 'Experience', color: '#2f9591', on: '#fff8ea' },
-  { id: 'work', label: 'WORK', name: 'Work', color: '#e2493f', on: '#fff8ea' },
-  { id: 'results', label: 'RESULTS', name: 'Results', color: '#3e4392', on: '#fff8ea' },
-  { id: 'hire', label: 'HIRE LOCHAN', name: 'Hire Lochan', color: '#e2493f', on: '#fff8ea' },
+  { id: 'home', label: 'WHO AM I', name: 'Who am I', color: '#f2a33c', on: '#2b2438', tint: '#f6d9a2' },
+  { id: 'experience', label: 'EXPERIENCE', name: 'Experience', color: '#2f9591', on: '#fff8ea', tint: '#bfe2d9' },
+  { id: 'work', label: 'WORK', name: 'Work', color: '#e2493f', on: '#fff8ea', tint: '#f6c3b4' },
+  { id: 'results', label: 'RESULTS', name: 'Results', color: '#3e4392', on: '#fff8ea', tint: '#cbd0f2' },
+  { id: 'hire', label: 'HIRE LOCHAN', name: 'Hire Lochan', color: '#e2493f', on: '#fff8ea', tint: '#f6c3b4' },
 ]
 
 export const pageMeta = (id: PlaceId) => PAGES.find((p) => p.id === id)!
