@@ -1,0 +1,97 @@
+// Content -> page blocks. The case-study and chapter views only know about blocks (ui/Blocks.tsx), so both share one renderer.
+import type { Block, PanelContent } from '../engine/store'
+import type { Chapter } from './experience'
+import { CHAPTERS } from './experience'
+import { PROJECTS, WINGS, projectById } from './projects'
+import type { Project } from './projects'
+import { LINKS, mailFor } from './site'
+
+const wingName = (id: string) => WINGS.find((w) => w.id === id)?.name ?? ''
+
+export function projectPanel(p: Project): PanelContent {
+  const blocks: Block[] = []
+  const accent = WINGS.find((w) => w.id === p.wing)?.color
+
+  if (p.source === 'brief') {
+    // Named in the brief, but the write-up isn't on hand — never invent one.
+    blocks.push({ t: 'lead', text: `Want the story behind ${p.name}?` })
+    blocks.push({ t: 'p', text: 'This one is best told in conversation. Ask, and you’ll hear the story straight from Lochan.' })
+    blocks.push({
+      t: 'links',
+      items: [
+        { label: `Ask about ${p.name}`, href: mailFor(`${p.name} — tell me more`), note: LINKS.email },
+        { label: 'LinkedIn', href: LINKS.linkedin },
+      ],
+    })
+    return { id: p.id, kicker: wingName(p.wing), title: p.name, subtitle: 'Details on request', accent, blocks }
+  }
+
+  if (p.hook) blocks.push({ t: 'lead', text: p.hook })
+  if (p.metrics?.length) blocks.push({ t: 'metrics', items: p.metrics.slice(0, 3).map(splitMetric) })
+  if (p.facts?.length) blocks.push({ t: 'facts', items: p.facts })
+  p.story?.forEach((para, i) => {
+    blocks.push({ t: 'p', text: para })
+    const list = p.lists?.[i]
+    if (list) blocks.push({ t: 'list', items: list })
+  })
+  if (p.metrics?.length) blocks.push({ t: 'list', title: 'Impact & metrics', items: p.metrics })
+  if (p.link) blocks.push({ t: 'links', items: [{ label: `${p.link.label} →`, href: p.link.href }] })
+  if (p.samples?.length) blocks.push({ t: 'embeds', title: 'Work samples', urls: p.samples })
+  return {
+    id: p.id,
+    kicker: [p.role, wingName(p.wing)].filter(Boolean).join(' · '),
+    title: p.name,
+    subtitle: p.headline,
+    accent,
+    image: p.logo ? { src: p.logo, alt: `${p.name} logo` } : undefined,
+    blocks,
+  }
+}
+
+/** turn "10M+ Views from 12 Videos" into a big value + label where it reads naturally */
+function splitMetric(m: string): { value: string; label: string } {
+  const hit = m.match(/^(\d[\d.,]*\s?[KMB]?\+?)\s+(.*)$/i)
+  if (hit) return { value: hit[1].replace(/\s/g, ''), label: hit[2] }
+  const grew = m.match(/^Grew from (.+?) to (.+?)(?: followers| subscribers| in just.*)?$/i)
+  if (grew) return { value: `${grew[1]} → ${grew[2]}`, label: m.includes('subscribers') ? 'subscribers' : 'followers' }
+  return { value: '', label: m }
+}
+
+export function chapterPanel(c: Chapter): PanelContent {
+  const blocks: Block[] = []
+  if (c.source === 'brief') {
+    blocks.push({ t: 'lead', text: 'Another chapter — best told in person.' })
+    blocks.push({ t: 'p', text: 'Ask Lochan about it and you’ll hear the story straight from the source.' })
+    blocks.push({
+      t: 'links',
+      items: [
+        { label: 'Ask about Social Capital', href: mailFor('Social Capital — tell me more'), note: LINKS.email },
+        { label: 'LinkedIn', href: LINKS.linkedin },
+      ],
+    })
+    return { id: c.id, kicker: 'Experience', title: c.name, accent: c.color, blocks }
+  }
+  if (c.blurb) blocks.push({ t: 'lead', text: c.blurb })
+  c.story?.forEach((s) => blocks.push({ t: 'p', text: s }))
+  if (c.facts?.length) blocks.push({ t: 'facts', items: c.facts })
+  if (c.work?.length) {
+    blocks.push({
+      t: 'list',
+      title: 'What I worked on',
+      items: c.work.map((w) => [w.name, w.growth, w.note].filter(Boolean).join(' — ')),
+    })
+    const linked = c.work.filter((w) => w.projectId).map((w) => projectById(w.projectId!)).filter(Boolean) as Project[]
+    if (linked.length) blocks.push({ t: 'tags', items: linked.map((p) => `Case study: ${p.name}`) })
+  }
+  if (c.samples?.length) blocks.push({ t: 'embeds', title: 'Samples', urls: c.samples })
+  return {
+    id: c.id,
+    kicker: [c.period, c.role].filter(Boolean).join(' · '),
+    title: c.name,
+    subtitle: c.title,
+    accent: c.color,
+    blocks,
+  }
+}
+
+export { PROJECTS, CHAPTERS }
