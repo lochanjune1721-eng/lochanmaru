@@ -1,0 +1,14 @@
+@font-face { font-family: 'Fraunces'; src: url('/fonts/fraunces.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: 'DM Sans'; src: url('/fonts/dm-sans.woff2') format('woff2'); font-weight: 100 1000; font-display: swap; }
+@font-face { font-family: 'DM Mono'; src: url('/fonts/dm-mono-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'DM Mono'; src: url('/fonts/dm-mono-500.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+
+:root { --paper: #f8ecd5; --ink: #2b2438; --saffron: #f2a33c; --terracotta: #d9744f; --teal: #2f9591; }
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; height: 100%; background: #f8d3b1; overscroll-behavior: none; }
+body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.stage { position: fixed; inset: 0; overflow: hidden; touch-action: none; }
+.stage canvas { display: block; }
+.controls-layer { position: absolute; inset: 0; z-index: 2; touch-action: none; }
+.stick-base { position: absolute; left: 0; top: 0; width: 116px; height: 116px; border-radius: 50%; border: 2px solid rgba(255,255,255,.55); background: rgba(255,255,255,.14); opacity: 0; pointer-events: none; transition: opacity .18s; backdrop-filter: blur(2px); }
+.stick-thumb { position: absolute; left: 33px; top: 33px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,.85); box-shadow: 0 4px 14px rgba(43,36,56,.25); }
