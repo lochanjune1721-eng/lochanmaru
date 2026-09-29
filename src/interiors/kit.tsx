@@ -10,7 +10,7 @@ import { ColliderSet } from '../engine/collision'
 import { register } from '../engine/interact'
 import { exitBuilding, stage } from '../engine/scenes'
 import { InteriorRuntime } from '../engine/state'
-import { InteriorId } from '../engine/store'
+import { InteriorId, store } from '../engine/store'
 import { GeoBuilder } from '../gfx/geo'
 import { glowSpriteMaterial, worldMaterial } from '../gfx/materials'
 import { P } from '../gfx/palette'
@@ -128,7 +128,7 @@ function starTexture() {
 /** Opens a content panel and eases the camera onto a point in this room. */
 export function useOpen() {
   const { X0 } = useInterior()
-  return (panel: PanelContent, x: number, y: number, z: number, dist = 8) => showPanel(panel, new Vector3(X0 + x, y, z), dist)
+  return (panel: PanelContent, x: number, y: number, z: number, dist = 8, pitch = 0.4) => showPanel(panel, new Vector3(X0 + x, y, z), dist, pitch)
 }
 
 export interface HotspotProps {
@@ -148,10 +148,12 @@ export interface HotspotProps {
   active?: () => boolean
   /** show a bobbing sparkle until it's been used (default true) */
   sparkle?: boolean
+  /** where the sparkle floats (interior-local); defaults to just above the anchor */
+  markAt?: [number, number, number]
 }
 
 /** A thing in a room you can walk up to and use. */
-export function Hotspot({ id, x, y = 1.4, z, radius = 2.8, label, title, kind = 'object', look, onUse, onNear, priority, active, sparkle = true }: HotspotProps) {
+export function Hotspot({ id, x, y = 1.4, z, radius = 2.8, label, title, kind = 'object', look, onUse, onNear, priority, active, sparkle = true, markAt }: HotspotProps) {
   const { id: room, X0 } = useInterior()
   const star = useRef<Sprite>(null)
   const mat = useMemo(() => new SpriteMaterial({ map: starTexture(), transparent: true, depthWrite: false, blending: AdditiveBlending, opacity: 0.95, toneMapped: false }), [])
@@ -160,10 +162,10 @@ export function Hotspot({ id, x, y = 1.4, z, radius = 2.8, label, title, kind = 
     const s = star.current
     if (!s) return
     const gone = seen.has(key)
-    s.visible = !gone && game.mode === 'interior'
+    s.visible = !gone && game.mode === 'interior' && !store.getState().panel
     if (!gone) {
       const t = game.time
-      s.position.y = y + 0.85 + Math.sin(t * 2.2 + x) * 0.12
+      s.position.y = (markAt ? markAt[1] : y + 0.85) + Math.sin(t * 2.2 + x) * 0.12
       s.scale.setScalar(0.95 + Math.sin(t * 3.1 + z) * 0.12)
       mat.rotation = t * 0.5
     }
@@ -188,7 +190,7 @@ export function Hotspot({ id, x, y = 1.4, z, radius = 2.8, label, title, kind = 
       active,
     })
   }, [room, X0, id, x, y, z, radius, label, title, kind, look, onUse, onNear, priority, active])
-  return sparkle && kind !== 'secret' ? <sprite ref={star} material={mat} position={[x, y + 0.85, z]} renderOrder={5} /> : null
+  return sparkle && kind !== 'secret' ? <sprite ref={star} material={mat} position={markAt ?? [x, y + 0.85, z]} renderOrder={5} /> : null
 }
 
 /** A low glowing threshold at the front edge of the room (nothing tall between camera and visitor). */

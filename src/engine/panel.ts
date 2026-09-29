@@ -7,7 +7,7 @@ import { PanelContent, store } from './store'
 
 let prevEnabled = true
 
-export function showPanel(content: PanelContent, focus?: Vector3, dist = 8.5) {
+export function showPanel(content: PanelContent, focus?: Vector3, dist = 8.5, pitch = 0.4) {
   const st = store.getState()
   prevEnabled = true
   st.openPanel(content)
@@ -17,7 +17,7 @@ export function showPanel(content: PanelContent, focus?: Vector3, dist = 8.5) {
   if (focus) {
     cam.focusTarget = focus.clone()
     cam.focusDist = dist
-    cam.focusPitch = 0.4
+    cam.focusPitch = pitch
   }
   bus.emit('panel', 'open', content.id)
 }

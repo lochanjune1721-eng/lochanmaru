@@ -32,7 +32,7 @@ export function Sky() {
       u.cMid.value.set(k.skyMid)
       u.cHorizon.value.set(k.skyHor)
       u.uUp.value.set(0, 1, 0)
-      u.uHorizon.value = -0.35
+      u.uHorizon.value = k.horizon ?? -0.35
       u.uSunDir.value.set(0, -1, 0)
       u.uMoonDir.value.set(0, -1, 0)
       return

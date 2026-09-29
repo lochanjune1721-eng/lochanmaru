@@ -119,8 +119,11 @@ function followPose(dt: number, pos: Vector3, look: Vector3, up: Vector3, hardSn
 
   look.copy(cam.focus)
   _right.crossVectors(cam.fwd, up).normalize()
-  if (!mobile) look.addScaledVector(_right, shift * 3.4)
-  else look.addScaledVector(up, -shift * 2.4)
+  // centre the subject in the part of the screen the panel leaves free (panel = 480px + margin on desktop,
+  // ~78% of the height on phones): world shift = (covered fraction) * tan(fov/2) * distance
+  const halfH = Math.tan((cam.fov * Math.PI) / 360) * dist
+  if (!mobile) look.addScaledVector(_right, shift * (Math.min(494, window.innerWidth * 0.5) / window.innerHeight) * halfH)
+  else look.addScaledVector(up, -shift * 0.68 * halfH)
 
   _des.copy(look).addScaledVector(up, Math.sin(pitch) * dist).addScaledVector(cam.fwd, -Math.cos(pitch) * dist)
 

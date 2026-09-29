@@ -186,4 +186,22 @@ export function contactPanel(): PanelContent {
   }
 }
 
+/** One contact channel as a panel (used by the objects in the Hire room). */
+export function channelPanel(id: string): PanelContent | null {
+  const c = CHANNELS.find((x) => x.id === id)
+  if (!c) return null
+  const verb: Record<string, string> = { email: 'Write an email', x: 'Say hi on X', linkedin: 'Connect on LinkedIn', instagram: 'Follow on Instagram', phone: 'Call', resume: 'Open the résumé' }
+  return {
+    id: `channel-${c.id}`,
+    kicker: 'Hire Lochan',
+    title: c.label,
+    subtitle: c.value,
+    accent: '#e2493f',
+    blocks: [
+      { t: 'links', items: [{ label: `${verb[c.id] ?? c.label} →`, href: c.href, note: c.value }] },
+      { t: 'quote', text: CLOSER },
+    ],
+  }
+}
+
 export { PROJECTS, CHAPTERS }
