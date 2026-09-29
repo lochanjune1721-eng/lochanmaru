@@ -32,6 +32,7 @@ export const player = {
   /** cutscene lock: no input steering */
   frozen: true,
   radius: 0.5,
+  visible: false,
   /** 0..1 spawn-drop animation progress; -1 = not dropping */
   drop: -1,
   /** angular velocity of heading (for banking into turns) */

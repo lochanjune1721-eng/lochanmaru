@@ -48,7 +48,7 @@ export function updateInteractions(dt: number, camera: PerspectiveCamera) {
   const sc = scope()
 
   // nearest usable
-  let found = playing && !player.frozen ? findNearest(player.pos, sc) : null
+  let found = playing && !player.frozen ? findNearest(player.pos, sc, player.up) : null
   const prev = current.item
   current.item = found ? found.item : null
   current.dist = found ? found.dist : 0

@@ -107,7 +107,7 @@ function swapToInterior(id: InteriorId) {
   player.velDir.copy(sp.dir)
   player.speed = 0
   cam.fwd.set(0, 0, -1)
-  cam.pitch = 0.74
+  cam.pitch = 0.6
   cam.zoom = 1
   cam.focus.copy(sp.pos)
   resetFollowSmoothing()

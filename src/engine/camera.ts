@@ -48,8 +48,8 @@ export function introPose(time: number, pos: Vector3, look: Vector3, up: Vector3
   const sb = Math.sin(b)
   const y2 = base.y * cb - z1 * sb
   const z2 = base.y * sb + z1 * cb
-  pos.set(x1, y2, z2).normalize().multiplyScalar(R + 66)
-  look.set(0, 13.5, 0)
+  pos.set(x1, y2, z2).normalize().multiplyScalar(R + 90)
+  look.set(0, 27, 0)
   up.set(0, 1, 0)
 }
 
@@ -84,6 +84,7 @@ function followPose(dt: number, pos: Vector3, look: Vector3, up: Vector3, hardSn
   // --- focus point ---
   const ahead = clamp(player.speed * 0.16, 0, 1.6)
   _tgt.copy(player.pos).addScaledVector(up, 1.15).addScaledVector(player.velDir, ahead)
+  if (interior) _tgt.addScaledVector(cam.fwd, 3.2)
   // interaction focus: lean towards a target point
   if (cam.focusTarget) {
     cam.focusAmt = damp(cam.focusAmt, 1, 3.2, dt)
@@ -101,7 +102,7 @@ function followPose(dt: number, pos: Vector3, look: Vector3, up: Vector3, hardSn
   }
 
   // --- distance / pitch ---
-  const baseDist = (interior ? 11.2 : 13.6) * cam.zoom
+  const baseDist = (interior ? 17.5 : 13.6) * cam.zoom
   const sprintBonus = player.sprint ? 1.3 : 0
   const focusDist = cam.focusTarget ? lerp(baseDist, cam.focusDist, cam.focusAmt) : baseDist
   const wantDist = focusDist + sprintBonus
@@ -226,7 +227,7 @@ export function updateCamera(camera: PerspectiveCamera, dt: number) {
 export function beginFlight(camera: PerspectiveCamera) {
   flight.fromPos.copy(camera.position)
   flight.fromUp.copy(camera.up)
-  flight.fromLook.set(0, 13.5, 0)
+  flight.fromLook.set(0, 27, 0)
   flight.fromFov = camera.fov
   cam.flightT = 0
   cam.mode = 'flight'

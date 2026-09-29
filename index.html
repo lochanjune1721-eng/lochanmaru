@@ -3,10 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <title>Lochan's World</title>
+    <title>Lochan Maheshwari — a tiny world · Creative Director, Strategist, Builder</title>
+    <meta name="description" content="Lochan Maheshwari's portfolio as a tiny explorable world. Creative Director, Strategist and Builder — scaling brands across AI, FinTech, EdTech and Politics. Walk around, open the doors, find the work." />
+    <meta name="theme-color" content="#f8d3b1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/dm-sans.woff2" as="font" type="font/woff2" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Lochan Maheshwari — a tiny world" />
+    <meta property="og:description" content="Don't scroll a portfolio. Walk around one. Creative Director · Strategist · Builder." />
+    <meta property="og:image" content="/og.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <style>
+      /* critical: the loading screen paints before any JS arrives */
+      html,body{margin:0;height:100%;background:#f8d3b1}
+      #boot{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(120% 90% at 50% 100%,#ffe0b8 0%,#f7c9c4 45%,#d9b6e6 100%);color:#2b2438;font-family:'Fraunces',Georgia,serif;text-align:center;z-index:99}
+      #boot b{display:block;font-weight:900;font-size:22px;letter-spacing:.03em}
+      #boot i{display:block;width:74px;height:74px;margin:0 auto 18px;border-radius:50%;border:3px solid #2b2438;background:radial-gradient(circle at 35% 30%,#b6ea9a,#4fae72);animation:b 1.6s linear infinite}
+      @keyframes b{to{transform:rotate(360deg)}}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div id="boot"><div><i></i><b>LOADING LOCHAN’S WORLD…</b></div></div></div>
+    <noscript>
+      <main style="max-width:720px;margin:40px auto;padding:0 20px;font-family:Georgia,serif;line-height:1.6">
+        <h1>Lochan Maheshwari</h1>
+        <p>Creative Director · Strategist · Builder.</p>
+        <p>This portfolio is a small interactive 3D world and needs JavaScript. You can reach Lochan at <a href="mailto:lochanmaheshwari23@gmail.com">lochanmaheshwari23@gmail.com</a> or on <a href="https://www.linkedin.com/in/lochan-maru/">LinkedIn</a>.</p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

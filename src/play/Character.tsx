@@ -20,6 +20,7 @@ export interface CharState {
   glance: Vector3 | null
   sprint: boolean
   lastMoveAt: number
+  visible?: boolean
 }
 
 export interface CharLook {
@@ -167,6 +168,7 @@ export function Character({ state, look = LOOK_PLAYER, scale = 0.92, isPlayer = 
     _m.setPosition(_g)
     r.matrix.copy(_m)
     r.matrixWorldNeedsUpdate = true
+    r.visible = S.visible !== false
 
     // ---- gait ----------------------------------------------------------------------
     const spd = S.speed

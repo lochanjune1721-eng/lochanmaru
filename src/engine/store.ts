@@ -48,6 +48,7 @@ interface State {
   hint: string | null
   nearPoi: InteriorId | null
   helpOpen: boolean
+  textOpen: boolean
 
   set: (p: Partial<State>) => void
   setProgress: (p: number, label?: string) => void
@@ -84,6 +85,7 @@ export const useStore = create<State>((set, get) => ({
   hint: null,
   nearPoi: null,
   helpOpen: false,
+  textOpen: false,
 
   set: (p) => set(p),
   setProgress: (p, label) => set({ loadProgress: Math.max(get().loadProgress, p), ...(label ? { loadLabel: label } : {}) }),

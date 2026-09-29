@@ -1,35 +1,48 @@
 import { Canvas } from '@react-three/fiber'
 import { useEffect, useState } from 'react'
 import { NoToneMapping, PCFShadowMap } from 'three'
-import { installKeyboard, input } from './engine/input'
+import { installKeyboard } from './engine/input'
+import { skipIntro } from './engine/journey'
 import { quality } from './engine/quality'
-import { cam, player } from './engine/state'
 import { store } from './engine/store'
-import { resetPlayerToSpawn } from './engine/boot'
 import { P } from './gfx/palette'
-import { World } from './world/World'
-import { Controls } from './ui/Controls'
 import { loadFonts } from './gfx/text'
+import { LoadCoordinator } from './play/LoadCoordinator'
+import { Controls } from './ui/Controls'
+import { Fallback } from './ui/Fallback'
+import { Overlay } from './ui/Overlay'
+import { World } from './world/World'
 
 const params = new URLSearchParams(location.search)
+
+function hasWebGL() {
+  try {
+    const c = document.createElement('canvas')
+    return !!(c.getContext('webgl2') || c.getContext('webgl'))
+  } catch {
+    return false
+  }
+}
+
+const WEBGL = hasWebGL()
 
 export default function App() {
   const [fontsReady, setFontsReady] = useState(false)
   useEffect(() => installKeyboard(), [])
   useEffect(() => {
-    loadFonts().then(() => setFontsReady(true))
+    store.getState().setProgress(0.08, 'Warming up the sun')
+    loadFonts().then(() => {
+      store.getState().setProgress(0.2, 'Planting the trees')
+      // give the loader a paint before the (synchronous) world build blocks the main thread
+      requestAnimationFrame(() => requestAnimationFrame(() => setFontsReady(true)))
+    })
   }, [])
 
   useEffect(() => {
-    if (params.get('autostart') === '1') {
-      resetPlayerToSpawn()
-      player.frozen = false
-      player.drop = -1
-      cam.mode = 'follow'
-      input.enabled = true
-      store.getState().set({ phase: 'playing' })
-    }
-  }, [])
+    if (params.get('autostart') === '1' && fontsReady) skipIntro()
+  }, [fontsReady])
+
+  if (!WEBGL) return <Fallback force />
 
   return (
     <div className="stage">
@@ -40,9 +53,15 @@ export default function App() {
         gl={{ antialias: quality.antialias, powerPreference: 'high-performance', toneMapping: NoToneMapping }}
         onCreated={({ gl }) => gl.setClearColor(P.fog)}
       >
-        {fontsReady && <World />}
+        {fontsReady && (
+          <>
+            <World />
+            <LoadCoordinator />
+          </>
+        )}
       </Canvas>
       <Controls />
+      <Overlay />
     </div>
   )
 }

@@ -148,6 +148,21 @@ ${NOISE_GLSL}`,
       )
       .replace('#include <lights_lambert_pars_fragment>', lambertChunk)
 
+    // dissolve anything that comes right up to the lens (screen-door dither), so foliage never smothers the view
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <clipping_planes_fragment>',
+      `#include <clipping_planes_fragment>
+{
+  float dcam = length( vViewPosition );
+  float fadeN = smoothstep( 1.4, 4.6, dcam );
+  if ( fadeN < 1.0 ) {
+    float dn = fract( dot( gl_FragCoord.xy, vec2( 0.06711056, 0.00583715 ) ) );
+    dn = fract( 52.9829189 * dn );
+    if ( dn > fadeN ) discard;
+  }
+}`,
+    )
+
     if (o.ground) {
       shader.fragmentShader = shader.fragmentShader.replace(
         '#include <color_fragment>',

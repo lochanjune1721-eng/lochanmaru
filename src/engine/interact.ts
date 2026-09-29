@@ -37,7 +37,9 @@ export function register(i: Interactable) {
 
 const _d = new Vector3()
 
-export function findNearest(pos: Vector3, scope: string): { item: Interactable; dist: number } | null {
+const _h = new Vector3()
+
+export function findNearest(pos: Vector3, scope: string, up?: Vector3): { item: Interactable; dist: number } | null {
   let best: Interactable | null = null
   let bestScore = Infinity
   let bestDist = 0
@@ -47,8 +49,12 @@ export function findNearest(pos: Vector3, scope: string): { item: Interactable; 
     const d = _d.copy(i.anchor).sub(pos).length()
     if (d > i.radius) continue
     if (i.dir) {
-      const cos = _d.normalize().dot(i.dir)
-      // player must be on the side the direction points AWAY from (i.e. in front of the door)
+      // player must be on the side the direction points AWAY from (i.e. in front of the door);
+      // judged on the ground plane only, so a tall anchor never fools the cone when standing close
+      _h.copy(_d)
+      if (up) _h.addScaledVector(up, -_h.dot(up))
+      const hl = _h.length()
+      const cos = hl > 1e-3 ? _h.multiplyScalar(1 / hl).dot(i.dir) : 0
       if (-cos < (i.dirCos ?? 0.2)) continue
     }
     const score = d - (i.priority ?? 0) * 3

@@ -6,6 +6,8 @@ import { game } from '../engine/game'
 import { mapBasisAt, mapToN, surfaceDistance } from '../engine/planet'
 import { P } from '../gfx/palette'
 import { POIS } from './layout'
+import { LOOK } from '../interiors/presets'
+import { store } from '../engine/store'
 
 const _north = new Vector3()
 const _east = new Vector3()
@@ -46,20 +48,46 @@ export function LightRig() {
     l.parent?.add(l.target)
   }, [])
 
+  const applied = useRef('')
+
   useFrame(() => {
     const l = sun.current
     const h = hemi.current
     if (!l || !h) return
-    const n = game.focusN
-    mapBasisAt(n, _north, _east)
-    const az = sunAzimuthAt(n)
-    const cosE = Math.cos(SUN_EL)
-    game.sunDir
-      .copy(n)
-      .multiplyScalar(Math.sin(SUN_EL))
-      .addScaledVector(_north, Math.cos(az) * cosE)
-      .addScaledVector(_east, Math.sin(az) * cosE)
-      .normalize()
+    const room = game.mode === 'interior' ? store.getState().interior : null
+    const key = room ?? 'world'
+    if (applied.current !== key) {
+      applied.current = key
+      if (room) {
+        const k = LOOK[room]
+        l.color.set(k.sun)
+        l.intensity = k.sunI
+        h.color.set(k.hemiSky)
+        h.groundColor.set(k.hemiGround)
+        h.intensity = k.hemiI
+      } else {
+        l.color.set(P.sun)
+        l.intensity = 3.4
+        h.color.set(P.hemiSky)
+        h.groundColor.set(P.hemiGround)
+        h.intensity = 1.25
+      }
+    }
+    if (room) {
+      const k = LOOK[room]
+      game.sunDir.set(k.dir[0], k.dir[1], k.dir[2]).normalize()
+    } else {
+      const n = game.focusN
+      mapBasisAt(n, _north, _east)
+      const az = sunAzimuthAt(n)
+      const cosE = Math.cos(SUN_EL)
+      game.sunDir
+        .copy(n)
+        .multiplyScalar(Math.sin(SUN_EL))
+        .addScaledVector(_north, Math.cos(az) * cosE)
+        .addScaledVector(_east, Math.sin(az) * cosE)
+        .normalize()
+    }
 
     // hemisphere "up" follows the local surface normal
     h.position.copy(game.up).multiplyScalar(10)

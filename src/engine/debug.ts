@@ -1,30 +1,31 @@
 // Debug/test hooks (only installed with ?debug). Lets automated tests step the simulation deterministically.
 import { PerspectiveCamera, Vector3 } from 'three'
-import { updateCamera, resetFollowSmoothing, debugPose } from './camera'
+import { resetFollowSmoothing, debugPose } from './camera'
+import { simStep } from './sim'
 import { game } from './game'
 import { input } from './input'
-import { updateInteractions, current } from './interactions'
+import { current } from './interactions'
 import { mapBasisAt, mapToN, nToMap } from './planet'
-import { updatePlayer } from './player'
 import { cam, player } from './state'
 import { store } from './store'
 import { groundPoint } from '../world/terrain'
+import { buildings } from './scenes'
+import { registry } from './interact'
+import { toTangent } from './planet'
 
 export function installDebug(camera: PerspectiveCamera) {
   const api = {
+    camera,
     player,
     cam,
     game,
     store,
     input,
     current,
+    registry,
+    buildings,
     step(n = 1, dt = 1 / 30) {
-      for (let i = 0; i < n; i++) {
-        game.time += dt
-        updatePlayer(dt)
-        updateInteractions(dt, camera)
-        updateCamera(camera, dt)
-      }
+      for (let i = 0; i < n; i++) simStep(dt, camera)
     },
     teleport(x: number, z: number, yawDeg?: number) {
       const n = mapToN(x, z)
@@ -61,6 +62,29 @@ export function installDebug(camera: PerspectiveCamera) {
       game.focusN.copy(n)
       game.up.copy(n)
       game.focus.copy(g)
+    },
+    /** absolute free camera (interior inspection) */
+    freeCam(pos: [number, number, number], look: [number, number, number], fov = 40) {
+      debugPose.on = true
+      debugPose.pos.set(...pos)
+      debugPose.look.set(...look)
+      debugPose.up.set(0, 1, 0)
+      debugPose.fov = fov
+    },
+    /** stand a few steps in front of a building's door, facing it */
+    goDoor(id: string, back = 0.5) {
+      const b = (buildings as any)[id]
+      if (!b) return false
+      const n = b.outN.clone().lerp(b.door.clone().normalize(), back).normalize()
+      player.n.copy(n)
+      player.up.copy(n)
+      groundPoint(n, player.pos)
+      const h = toTangent(b.outDir.clone().negate(), n)
+      player.heading.copy(h)
+      player.velDir.copy(h)
+      cam.fwd.copy(h)
+      resetFollowSmoothing()
+      return true
     },
     viewOff() {
       debugPose.on = false
