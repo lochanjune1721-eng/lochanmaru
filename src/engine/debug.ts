@@ -10,6 +10,7 @@ import { cam, player } from './state'
 import { store } from './store'
 import { groundPoint } from '../world/terrain'
 import { closePage, openPage, places } from './places'
+import { pickPlaceAt } from './pick'
 import { registry } from './interact'
 import { toTangent } from './planet'
 
@@ -26,6 +27,8 @@ export function installDebug(camera: PerspectiveCamera, gl?: WebGLRenderer) {
     places,
     openPage,
     closePage,
+    /** which building is under a screen point (or null) */
+    pick: (x: number, y: number) => pickPlaceAt(camera, x, y),
     step(n = 1, dt = 1 / 30) {
       for (let i = 0; i < n; i++) simStep(dt, camera)
     },

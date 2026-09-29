@@ -29,6 +29,8 @@ Deploys as-is to Vercel (`vercel.json` adds long-lived cache headers for hashed 
 | Sound      | `M` (off by default)                      | speaker chip                      |
 | Help       | `H`                                       | ? chip                            |
 
+* Every page has an address, so a case study can be shared: `/#/work/gfg`, `/#/experience/brandflow`, `/#/hire`
+  (the address bar follows whatever is open, and the site opens on it after the intro).
 * A **text version** of the whole portfolio is one click away on the intro screen (and used automatically when
   WebGL is unavailable). It is also linked as “Read the text version” for screen-reader and keyboard users.
 * `prefers-reduced-motion` shortens the intro fly-in and removes the birds and butterflies.

@@ -50,7 +50,7 @@ function Wall() {
   const count = (w: Filter) => PROJECTS.filter((p) => w === 'all' || p.wing === w).length
   return (
     <>
-      <Hero id="work" kicker="Work" title="Case studies" sub={`${PROJECTS.filter((p) => p.source === 'site').length} write-ups · ${PROJECTS.length} brands`} />
+      <Hero id="work" kicker="Work" title="Case studies" sub={`${PROJECTS.filter((p) => p.source === 'site').length} write-ups · ${PROJECTS.filter((p) => p.source !== 'site').length} more on request`} />
       <div className="pg-main">
         <div className="pg-filters rv" style={rv(1).style} role="tablist" aria-label="Filter the work">
           {([{ id: 'all', name: 'All', color: '#2b2438' }, ...WINGS] as { id: Filter; name: string; color: string }[]).map((w) => (

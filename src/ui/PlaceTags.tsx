@@ -18,6 +18,7 @@ export function PlaceTags() {
   const phase = useStore((s) => s.phase)
   const page = useStore((s) => s.page)
   const hover = useStore((s) => s.hoverPlace)
+  const visited = useStore((s) => s.visited)
   const refs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export function PlaceTags() {
           ref={(el) => {
             refs.current[p.id] = el
           }}
-          className={`tag ${hover === p.id ? 'hover' : ''}`}
+          className={`tag ${hover === p.id ? 'hover' : ''} ${visited[p.id] ? '' : 'new'}`}
           style={vars({ '--c': p.color, '--on': p.on })}
           onClick={() => openPage(p.id)}
           onPointerEnter={() => (hoverTag.id = p.id)}
