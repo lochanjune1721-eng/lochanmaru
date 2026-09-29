@@ -1,5 +1,5 @@
 // Debug/test hooks (only installed with ?debug). Lets automated tests step the simulation deterministically.
-import { PerspectiveCamera, Vector3 } from 'three'
+import { PerspectiveCamera, Vector3, WebGLRenderer } from 'three'
 import { resetFollowSmoothing, debugPose } from './camera'
 import { simStep } from './sim'
 import { game } from './game'
@@ -9,11 +9,11 @@ import { mapBasisAt, mapToN, nToMap } from './planet'
 import { cam, player } from './state'
 import { store } from './store'
 import { groundPoint } from '../world/terrain'
-import { buildings } from './scenes'
+import { buildings, scene } from './scenes'
 import { registry } from './interact'
 import { toTangent } from './planet'
 
-export function installDebug(camera: PerspectiveCamera) {
+export function installDebug(camera: PerspectiveCamera, gl?: WebGLRenderer) {
   const api = {
     camera,
     player,
@@ -24,6 +24,7 @@ export function installDebug(camera: PerspectiveCamera) {
     current,
     registry,
     buildings,
+    scene,
     step(n = 1, dt = 1 / 30) {
       for (let i = 0; i < n; i++) simStep(dt, camera)
     },
@@ -86,6 +87,12 @@ export function installDebug(camera: PerspectiveCamera) {
     },
     viewOff() {
       debugPose.on = false
+    },
+    /** renderer statistics for the last frame (draw calls, triangles, textures, geometries, programs) */
+    stats() {
+      if (!gl) return null
+      const i = gl.info
+      return { calls: i.render.calls, triangles: i.render.triangles, points: i.render.points, geometries: i.memory.geometries, textures: i.memory.textures, programs: i.programs?.length ?? 0 }
     },
     where() {
       return nToMap(player.n)

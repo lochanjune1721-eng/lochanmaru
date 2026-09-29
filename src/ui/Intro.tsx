@@ -48,6 +48,7 @@ export function Intro() {
             const on = !audioOn
             set({ audioOn: on })
             audio.setEnabled(on)
+            audio.ui('tick')
             try {
               localStorage.setItem('lw:audio', on ? '1' : '0')
             } catch {

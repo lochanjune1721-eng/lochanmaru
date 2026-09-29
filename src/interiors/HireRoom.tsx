@@ -247,6 +247,185 @@ const smooth = (a: number, b: number, x: number) => {
 }
 
 // ---- door -----------------------------------------------------------------------------------------------------
+
+// ---- what waits behind each door (painted, revealed as the door swings open) ------------------------------------------
+function doorScene(id: string, color: string) {
+  const w = 300
+  const h = 462
+  const { c, g } = makeCanvas(w, h)
+  const grad = g.createLinearGradient(0, 0, 0, h)
+  const base = new Color(color)
+  const dark = base.clone().multiplyScalar(0.28)
+  const light = base.clone().lerp(new Color('#fff2d0'), 0.55)
+  grad.addColorStop(0, `#${dark.getHexString()}`)
+  grad.addColorStop(0.7, `#${base.getHexString()}`)
+  grad.addColorStop(1, `#${light.getHexString()}`)
+  g.fillStyle = grad
+  g.fillRect(0, 0, w, h)
+  const cream = '#fff4dc'
+  const star = (x: number, y: number, r: number, a = 1) => {
+    g.fillStyle = `rgba(255,244,220,${a})`
+    g.beginPath()
+    for (let i = 0; i < 8; i++) {
+      const rr = i % 2 ? r * 0.35 : r
+      const an = (i / 8) * Math.PI * 2
+      g.lineTo(x + Math.sin(an) * rr, y - Math.cos(an) * rr)
+    }
+    g.closePath()
+    g.fill()
+  }
+  if (id === 'direction') {
+    // a little stage: curtains, a spotlight and an empty director's chair
+    g.fillStyle = '#7a2a2a'
+    g.beginPath()
+    g.moveTo(0, 0)
+    g.quadraticCurveTo(110, 120, 40, h)
+    g.lineTo(0, h)
+    g.fill()
+    g.beginPath()
+    g.moveTo(w, 0)
+    g.quadraticCurveTo(w - 110, 120, w - 40, h)
+    g.lineTo(w, h)
+    g.fill()
+    g.fillStyle = 'rgba(255,244,210,0.28)'
+    g.beginPath()
+    g.moveTo(w / 2 - 14, 0)
+    g.lineTo(w / 2 + 14, 0)
+    g.lineTo(w / 2 + 120, h - 70)
+    g.lineTo(w / 2 - 120, h - 70)
+    g.fill()
+    g.fillStyle = 'rgba(255,244,210,0.55)'
+    g.beginPath()
+    g.ellipse(w / 2, h - 70, 120, 26, 0, 0, Math.PI * 2)
+    g.fill()
+    g.fillStyle = '#3a2434'
+    g.fillRect(w / 2 - 34, h - 190, 68, 8)
+    g.fillRect(w / 2 - 30, h - 182, 6, 100)
+    g.fillRect(w / 2 + 24, h - 182, 6, 100)
+    g.fillRect(w / 2 - 34, h - 250, 68, 56)
+    star(w / 2, 90, 16)
+  } else if (id === 'launch') {
+    for (let i = 0; i < 30; i++) star(Math.random() * w, Math.random() * h * 0.6, 2 + Math.random() * 3, 0.6)
+    // rocket
+    g.save()
+    g.translate(w / 2, 200)
+    g.rotate(0.12)
+    g.fillStyle = cream
+    g.beginPath()
+    g.moveTo(0, -120)
+    g.quadraticCurveTo(46, -50, 34, 70)
+    g.lineTo(-34, 70)
+    g.quadraticCurveTo(-46, -50, 0, -120)
+    g.fill()
+    g.fillStyle = '#e2493f'
+    g.beginPath()
+    g.moveTo(0, -120)
+    g.quadraticCurveTo(24, -96, 30, -70)
+    g.lineTo(-30, -70)
+    g.quadraticCurveTo(-24, -96, 0, -120)
+    g.fill()
+    g.fillStyle = '#8fd4ff'
+    g.beginPath()
+    g.arc(0, -20, 16, 0, Math.PI * 2)
+    g.fill()
+    g.fillStyle = '#e2493f'
+    g.beginPath()
+    g.moveTo(-34, 30)
+    g.lineTo(-64, 84)
+    g.lineTo(-34, 70)
+    g.fill()
+    g.beginPath()
+    g.moveTo(34, 30)
+    g.lineTo(64, 84)
+    g.lineTo(34, 70)
+    g.fill()
+    g.fillStyle = '#ffb347'
+    g.beginPath()
+    g.moveTo(-22, 70)
+    g.quadraticCurveTo(0, 190, 22, 70)
+    g.fill()
+    g.fillStyle = '#fff2b0'
+    g.beginPath()
+    g.moveTo(-12, 70)
+    g.quadraticCurveTo(0, 130, 12, 70)
+    g.fill()
+    g.restore()
+    g.fillStyle = 'rgba(255,255,255,0.55)'
+    for (const [x, y, r] of [[110, 400, 30], [150, 420, 36], [200, 405, 30], [240, 425, 24]]) {
+      g.beginPath()
+      g.arc(x, y, r, 0, Math.PI * 2)
+      g.fill()
+    }
+  } else if (id === 'content') {
+    // a phone playing something, with hearts and chat bubbles floating off it
+    g.fillStyle = '#2b2438'
+    roundRect(g, w / 2 - 62, 80, 124, 240, 20)
+    g.fill()
+    g.fillStyle = '#ffdca0'
+    roundRect(g, w / 2 - 52, 96, 104, 208, 12)
+    g.fill()
+    g.fillStyle = '#e2493f'
+    g.beginPath()
+    g.moveTo(w / 2 - 14, 168)
+    g.lineTo(w / 2 + 22, 200)
+    g.lineTo(w / 2 - 14, 232)
+    g.fill()
+    const heart = (x: number, y: number, s: number, col: string) => {
+      g.fillStyle = col
+      g.beginPath()
+      g.moveTo(x, y + s * 0.35)
+      g.bezierCurveTo(x - s, y - s * 0.4, x - s * 0.4, y - s, x, y - s * 0.3)
+      g.bezierCurveTo(x + s * 0.4, y - s, x + s, y - s * 0.4, x, y + s * 0.35)
+      g.fill()
+    }
+    heart(60, 130, 22, '#e2493f')
+    heart(244, 170, 18, '#f48fb1')
+    heart(70, 250, 16, '#f48fb1')
+    g.fillStyle = cream
+    roundRect(g, 200, 84, 70, 40, 12)
+    g.fill()
+    roundRect(g, 30, 300, 78, 40, 12)
+    g.fill()
+    g.fillStyle = 'rgba(43,36,56,0.65)'
+    for (const [x, y] of [[212, 96], [212, 108], [42, 312], [42, 324]]) g.fillRect(x, y, 46, 5)
+    g.fillStyle = 'rgba(255,255,255,0.35)'
+    g.fillRect(0, 368, w, 6)
+    for (let i = 0; i < 8; i++) g.fillRect(i * 42 + 8, 384, 26, 40)
+  } else {
+    // a little constellation of nodes, lit up and connected
+    const nodes: [number, number][] = [[150, 230], [60, 110], [240, 100], [40, 300], [250, 320], [150, 70], [150, 400], [210, 190], [90, 200]]
+    g.strokeStyle = 'rgba(255,244,220,0.7)'
+    g.lineWidth = 3
+    for (let i = 1; i < nodes.length; i++) {
+      g.beginPath()
+      g.moveTo(nodes[0][0], nodes[0][1])
+      g.lineTo(nodes[i][0], nodes[i][1])
+      g.stroke()
+    }
+    g.beginPath()
+    g.moveTo(nodes[1][0], nodes[1][1])
+    g.lineTo(nodes[5][0], nodes[5][1])
+    g.lineTo(nodes[2][0], nodes[2][1])
+    g.moveTo(nodes[3][0], nodes[3][1])
+    g.lineTo(nodes[6][0], nodes[6][1])
+    g.lineTo(nodes[4][0], nodes[4][1])
+    g.stroke()
+    nodes.forEach(([x, y], i) => {
+      const r = i === 0 ? 26 : 12 + (i % 3) * 3
+      const halo = g.createRadialGradient(x, y, 0, x, y, r * 2.4)
+      halo.addColorStop(0, 'rgba(255,240,190,0.75)')
+      halo.addColorStop(1, 'rgba(255,240,190,0)')
+      g.fillStyle = halo
+      g.fillRect(x - r * 2.4, y - r * 2.4, r * 4.8, r * 4.8)
+      g.fillStyle = i === 0 ? '#ffe3a1' : cream
+      g.beginPath()
+      g.arc(x, y, r, 0, Math.PI * 2)
+      g.fill()
+    })
+  }
+  return toTexture(c, 4)
+}
+
 function LanternDoor({ d, i }: { d: Door; i: number }) {
   const p = doorPose(i)
   const open = useOpen()
@@ -266,7 +445,8 @@ function LanternDoor({ d, i }: { d: Door; i: number }) {
   const mat = useMemo(() => worldMaterial({}), [])
   const hinge = useRef<Group>(null)
   const st = useRef({ open: 0, until: 0 })
-  const glowMat = useMemo(() => new MeshBasicMaterial({ color: new Color(d.color).lerp(new Color('#ffffff'), 0.4), transparent: true, opacity: 0, depthWrite: false, blending: AdditiveBlending, toneMapped: false }), [d.color])
+  const sceneTex = useMemo(() => doorScene(d.id, d.color), [d.id, d.color])
+  const glowMat = useMemo(() => new MeshBasicMaterial({ map: sceneTex, transparent: true, opacity: 0, depthWrite: false, toneMapped: false }), [sceneTex])
   const spillMat = useMemo(() => new MeshBasicMaterial({ color: d.color, transparent: true, opacity: 0, depthWrite: false, blending: AdditiveBlending, toneMapped: false, side: DoubleSide }), [d.color])
   const glowGeo = useMemo(() => new PlaneGeometry(DOOR_W, DOOR_H * 0.98), [])
   const spillGeo = useMemo(() => new PlaneGeometry(DOOR_W * 1.5, 4.6).rotateX(-Math.PI / 2), [])
@@ -277,7 +457,7 @@ function LanternDoor({ d, i }: { d: Door; i: number }) {
     const want = game.time < s.until || store.getState().panel?.id === `door-${d.id}`
     s.open = damp(s.open, want ? 1 : 0, want ? 5 : 2.4, Math.min(dt, 0.05))
     if (hinge.current) hinge.current.rotation.y = -s.open * 1.6
-    glowMat.opacity = 1.0 * s.open
+    glowMat.opacity = Math.min(1, s.open * 1.4)
     spillMat.opacity = 0.42 * s.open
   })
   const fx = p.x + Math.sin(p.rot) * 2.0

@@ -154,6 +154,7 @@ export async function exitBuilding() {
   store.getState().set({ interior: null })
   getDoor(id).force = true
   bus.emit('exit', id)
+  bus.emit('door', id, 'open')
   await new Promise((r) => setTimeout(r, 160))
   const p = screenOf(b.doorLook)
   bus.emit('iris', 'open')
