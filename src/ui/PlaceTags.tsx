@@ -31,7 +31,9 @@ export function PlaceTags() {
       const H = window.innerHeight
       const c = camera.position
       const dc = c.length()
-      for (const meta of PAGES) {
+      // read every width first, then write every transform (one layout per frame, not five)
+      const widths = PAGES.map((m) => refs.current[m.id]?.offsetWidth ?? 0)
+      for (const [k, meta] of PAGES.entries()) {
         const el = refs.current[meta.id]
         const pl = places[meta.id]
         if (!el) continue
@@ -50,7 +52,8 @@ export function PlaceTags() {
         let y = (-_p.y * 0.5 + 0.5) * H
         // a tag whose anchor has slipped off the top / sides of the screen stays pinned just inside it
         const inView = _p.z < 1 && x > -90 && x < W + 90 && y < H + 40
-        x = clamp(x, 70, W - 70)
+        const half = (widths[k] || 90) / 2 + 8
+        x = clamp(x, half, Math.max(half, W - half))
         y = Math.max(y, 104)
         const onScreen = inView
         // the OPEN prompt already names the building you're standing at
@@ -78,7 +81,7 @@ export function PlaceTags() {
             refs.current[p.id] = el
           }}
           className={`tag ${hover === p.id ? 'hover' : ''} ${visited[p.id] ? '' : 'new'}`}
-          style={vars({ '--c': p.color, '--on': p.on })}
+          style={vars({ '--c': p.chip, '--on': p.chipOn })}
           onClick={() => openPage(p.id)}
           onPointerEnter={() => (hoverTag.id = p.id)}
           onPointerLeave={() => (hoverTag.id = null)}

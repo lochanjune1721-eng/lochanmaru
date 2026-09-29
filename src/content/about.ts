@@ -1,4 +1,5 @@
 // WHO AM I — verbatim from the existing site's hero + About sections.
+import { PROOF } from './results'
 
 export const HERO = {
   lead: "I don't just create content; I engineer impact.",
@@ -23,3 +24,13 @@ export const EDUCATION = {
   place: 'National Institute of Technology, Karnataka',
   note: 'During the pandemic, college went online - I saw an opportunity to connect people. Created NIT Mechanics.',
 }
+
+/** Industries named in the hero copy: "AI, FinTech, EdTech, and Politics". */
+export const INDUSTRIES = ['AI', 'FinTech', 'EdTech', 'Politics'] as const
+
+/** "At a glance" tiles on the Who-am-I page — each figure is lifted from the hero / About copy above, nothing new. */
+export const GLANCE = [
+  { v: PROOF.find((p) => p.id === 'p-brands')?.value ?? '30+', l: 'Brands scaled' }, // "scaled narratives for 30+ brands"
+  { v: '0 → 1M+', l: 'Followers' }, // "From zero to Million+ followers"
+  { v: String(INDUSTRIES.length), l: `Industries: ${INDUSTRIES.join(' · ')}` },
+]

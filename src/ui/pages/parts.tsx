@@ -1,6 +1,7 @@
 import { CSSProperties, ReactNode, useEffect, useState } from 'react'
 import { openPage, setSection } from '../../engine/places'
 import type { PlaceId } from '../../engine/store'
+import { readable } from './color'
 import { PAGES, PageGlyph, pageMeta } from './meta'
 
 /** typed helper for setting CSS custom properties inline */
@@ -32,7 +33,7 @@ export function Hero({
   children?: ReactNode
   small?: boolean
 }) {
-  const style = accent ? vars({ '--accent': accent, '--on': isLight(accent) ? '#2b2438' : '#fff8ea', '--tint': tintOf(accent) }) : undefined
+  const style = accent ? vars({ '--accent': accent, '--on': readable(accent).fg, '--tint': tintOf(accent) }) : undefined
   return (
     <header className={`pg-hero ${small ? 'small' : ''}`} style={style}>
       <div className="pg-orb" aria-hidden>
@@ -70,16 +71,6 @@ export function tintOf(hex: string) {
   return `hsl(${Math.round(hue)} ${Math.round(s)}% 86%)`
 }
 
-/** rough perceived-lightness test so text on a chapter/wing colour stays readable */
-export function isLight(hex: string) {
-  const h = hex.replace('#', '')
-  const n = parseInt(h.length === 3 ? h.replace(/./g, '$&$&') : h, 16)
-  const r = (n >> 16) & 255
-  const g = (n >> 8) & 255
-  const b = n & 255
-  return 0.299 * r + 0.587 * g + 0.114 * b > 170
-}
-
 export function Sec({ title, aside, i = 0, id, children }: { title: ReactNode; aside?: ReactNode; i?: number; id?: string; children: ReactNode }) {
   return (
     <section className="pg-sec rv" style={vars({ '--i': i })} id={id}>
@@ -106,7 +97,7 @@ export function NextUp({ id }: { id: PlaceId }) {
   const i = PAGES.findIndex((p) => p.id === id)
   const next = PAGES[(i + 1) % PAGES.length]
   return (
-    <button className="pg-next rv" style={vars({ '--c': next.color, '--on': next.on, '--i': 12 })} onClick={() => openPage(next.id)}>
+    <button className="pg-next rv" style={vars({ '--c': next.chip, '--on': next.chipOn, '--i': 12 })} onClick={() => openPage(next.id)}>
       <span className="pg-next-ic">
         <PageGlyph id={next.id} size={24} />
       </span>

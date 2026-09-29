@@ -132,7 +132,9 @@ a { color: inherit; }
 @keyframes wobble { 0%, 100% { transform: rotate(-4deg) translateY(0); } 50% { transform: rotate(5deg) translateY(-6px); } }
 
 /* ---------- help ---------- */
+.help, .fallback { -webkit-user-select: text; user-select: text; }
 .help { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.94); width: min(440px, calc(100vw - 32px)); background: var(--paper); border: 2.5px solid var(--ink); border-radius: 24px; box-shadow: 0 6px 0 var(--ink), 0 30px 60px rgba(43, 36, 56, 0.35); padding: 22px 24px 20px; z-index: 40; opacity: 0; pointer-events: none; transition: transform 0.4s cubic-bezier(0.2, 1.4, 0.4, 1), opacity 0.25s; }
+.help:not(.show) { visibility: hidden; transition: transform 0.4s cubic-bezier(0.2, 1.4, 0.4, 1), opacity 0.25s, visibility 0s 0.4s; }
 .help.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
 .help h3 { margin: 0 0 12px; font-family: var(--display); font-variation-settings: var(--soft); font-weight: 900; font-size: 26px; }
 .help dl { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; margin: 0; align-items: center; }
@@ -175,8 +177,16 @@ a { color: inherit; }
   .radar { width: 96px; height: 96px; left: calc(10px + var(--safe-l)); bottom: calc(12px + var(--safe-b)); }
   .hint { bottom: calc(126px + var(--safe-b)); font-size: 11px; white-space: normal; text-align: center; width: max-content; max-width: 88vw; }
   .wordmark { display: none; }
-  .ui.paged .hud-tr { right: calc(14px + var(--safe-r)); }
   .toast { top: calc(60px + var(--safe-t)); }
+}
+/* bottom-sheet pages leave the top of the screen free, so the chips stay put */
+@media (max-width: 559.98px), (max-aspect-ratio: 21/20) {
+  .ui.paged .hud-tr { right: calc(14px + var(--safe-r)); }
+}
+/* very narrow phones: a slimmer place strip so it clears the sound / help chips */
+@media (max-width: 380px) {
+  .dots button { width: 26px; height: 26px; }
+  .dots b { display: none; }
 }
 /* touch devices: skip the live blur behind the HUD (it re-blurs the WebGL canvas every frame) */
 @media (pointer: coarse) {

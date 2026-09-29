@@ -4,13 +4,14 @@ import { projectById } from '../../content/projects'
 import { openPage, setSection } from '../../engine/places'
 import { useStore } from '../../engine/store'
 import { BlockView } from '../Blocks'
-import { BackBar, Hero, NextUp, PrevNext, Sec, isLight, rv, vars } from './parts'
+import { readable } from './color'
+import { BackBar, Hero, NextUp, PrevNext, Sec, rv, vars } from './parts'
 
 /** EXPERIENCE — the timeline, then one chapter at a time. */
 export function ExperiencePage() {
   const section = useStore((s) => s.pageSection)
   const chapter = section ? chapterById(section) : undefined
-  return chapter ? <ChapterDetail c={chapter} /> : <Timeline />
+  return chapter ? <ChapterDetail key={chapter.id} c={chapter} /> : <Timeline />
 }
 
 const growthChips = (c: Chapter) => {
@@ -23,11 +24,11 @@ const growthChips = (c: Chapter) => {
 function Timeline() {
   return (
     <>
-      <Hero id="experience" kicker="Experience" title="Chapter by chapter" sub={`${CHAPTERS.length} chapters · 2021 → present`} />
+      <Hero id="experience" kicker="Experience" title="Chapter by chapter" sub={`${CHAPTERS.length} chapters · ${CHAPTERS[0].period} → present`} />
       <div className="pg-main">
         <ol className="pg-tl">
           {CHAPTERS.map((c, i) => (
-            <li key={c.id} className="rv" style={vars({ '--c': c.color, '--on': isLight(c.color) ? '#2b2438' : '#fff8ea', '--i': i + 1 })}>
+            <li key={c.id} className="rv" style={vars({ '--c': readable(c.color).bg, '--on': readable(c.color).fg, '--i': i + 1 })}>
               <span className="pg-tl-dot" aria-hidden>
                 {c.mark}
               </span>

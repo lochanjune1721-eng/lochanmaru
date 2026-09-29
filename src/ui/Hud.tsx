@@ -63,7 +63,7 @@ export function Hud() {
                 <button
                   key={p.id}
                   className={`${visited[p.id] ? 'seen' : ''} ${page === p.id ? 'on' : ''}`}
-                  style={vars({ '--c': p.color, '--on': p.on })}
+                  style={vars({ '--c': p.chip, '--on': p.chipOn })}
                   title={p.label}
                   aria-label={`Open ${p.name}`}
                   onClick={() => openPage(p.id)}

@@ -1,8 +1,11 @@
 // Where the open page sits on screen. The camera uses this to put the building in the part of the window the page
 // leaves free, and the CSS reads the same numbers (as custom properties) so the two can never disagree.
 
-/** The page is a bottom sheet on phones and portrait windows, a side sheet otherwise. */
-export const sheetBottom = () => window.innerWidth < 760 || window.innerWidth <= window.innerHeight
+/**
+ * The page is a bottom sheet in tall / very narrow windows (phones held upright, portrait tablets) and a side sheet
+ * otherwise (landscape phones and everything wider). Keep in step with the media queries in styles/pages.css.
+ */
+export const sheetBottom = () => window.innerWidth < 560 || window.innerWidth <= window.innerHeight * 1.05
 
 /** Share of the window height a bottom sheet covers. */
 export const SHEET_H = 0.62

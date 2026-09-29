@@ -36,6 +36,9 @@
 .pg-x:hover { background: var(--marigold); transform: rotate(90deg); }
 .pg button:focus-visible, .pg a:focus-visible, .tag:focus-visible { outline: 3px solid var(--indigo); outline-offset: 2px; }
 
+.pg, .pg * { -webkit-user-select: text; user-select: text; }
+.pg button, .pg-grip { -webkit-user-select: none; user-select: none; }
+.pg-scroll:focus { outline: none; }
 .pg-scroll { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: rgba(43, 36, 56, 0.35) transparent; }
 .pg-page { min-height: 100%; }
 
@@ -75,7 +78,7 @@
 .pg-p.big { font-size: 17.5px; line-height: 1.7; }
 .pg-quote { margin: 0; padding-left: 20px; border-left: 6px solid var(--accent); font-family: var(--display); font-variation-settings: var(--soft), 'opsz' 72; font-weight: 700; font-size: clamp(24px, 3vw, 31px); line-height: 1.2; letter-spacing: -0.01em; text-wrap: balance; }
 .pg-card { background: var(--cream); border: 2px solid var(--ink); border-radius: 20px; box-shadow: 0 3px 0 var(--ink); }
-.pg-glance { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.pg-glance { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
 .pg-glance li { padding: 12px 14px 11px; border: 2px solid var(--ink); border-radius: 16px; background: var(--cream); box-shadow: 0 3px 0 var(--ink); }
 .pg-glance b { display: block; white-space: nowrap; font-family: var(--display); font-variation-settings: var(--soft), 'opsz' 96; font-weight: 900; font-size: clamp(19px, 4.8cqw, 28px); line-height: 1; }
 .pg-glance span { display: block; margin-top: 7px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; line-height: 1.4; text-transform: uppercase; color: var(--ink-2); }
@@ -240,7 +243,7 @@
 .pg-detail .b-emb iframe.yt { aspect-ratio: 16 / 9; grid-column: 1 / -1; }
 
 /* ---------- phones: a bottom sheet ---------- */
-@media (max-width: 759.98px), (max-aspect-ratio: 1/1) {
+@media (max-width: 559.98px), (max-aspect-ratio: 21/20) {
   .pg { top: auto; left: 0; right: 0; bottom: 0; width: auto; height: 62vh; height: var(--pgh, 62dvh); transition: transform 0.7s cubic-bezier(0.2, 1.05, 0.3, 1), opacity 0.35s, height 0.5s cubic-bezier(0.2, 1, 0.3, 1); border-radius: 26px 26px 0 0; border-bottom-width: 0; box-shadow: 0 -5px 0 var(--ink), 0 -20px 50px rgba(43, 36, 56, 0.3); transform: translateY(106%); }
   .pg.show { transform: none; }
   .pg.tall { height: 90vh; height: 90dvh; }
@@ -262,7 +265,7 @@
   .pg-sub { padding-right: 60px; font-size: 16px; }
   .pg-main { padding: 20px 18px calc(28px + var(--safe-b)); gap: 22px; }
   .pg-backbar { padding: 8px 18px; }
-  .pg-glance { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .pg-glance { gap: 8px; }
   .pg-glance span { font-size: 9.5px; }
   .pg-grid { grid-template-columns: minmax(0, 1fr); }
   .pg-doors { grid-template-columns: minmax(0, 1fr); }
@@ -284,8 +287,8 @@
 }
 
 /* landscape phones: less chrome, more page */
-@media (max-height: 519.98px) and (min-width: 760px) and (min-aspect-ratio: 1.01/1) {
-  .pg { top: 8px; bottom: 8px; right: 8px; border-radius: 22px; }
+@media (max-height: 519.98px) and (min-width: 560px) and (min-aspect-ratio: 21/20) {
+  .pg { top: calc(8px + var(--safe-t)); bottom: calc(8px + var(--safe-b)); right: calc(8px + var(--safe-r)); border-radius: 22px; }
   .pg-bar { padding: 8px 10px; }
   .pg-tab, .pg-x { height: 34px; }
   .pg-x { width: 34px; }
@@ -301,5 +304,8 @@
   .pg-main { padding: 16px 20px 24px; gap: 18px; }
   .pg-backbar { padding: 7px 20px; }
   .wordmark { display: none; }
+}
+/* side sheet in a window too narrow to fit the sound / help chips beside it */
+@media (max-width: 899.98px) and (min-aspect-ratio: 21/20) {
   .ui.paged .hud-tr { display: none; }
 }

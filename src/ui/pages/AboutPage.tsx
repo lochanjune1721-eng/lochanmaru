@@ -1,4 +1,4 @@
-import { EDUCATION, HERO, SKILLS, STORY } from '../../content/about'
+import { EDUCATION, GLANCE, HERO, SKILLS, STORY } from '../../content/about'
 import { SITE } from '../../content/site'
 import { Go, Hero, NextUp, Sec, rv } from './parts'
 
@@ -9,11 +9,6 @@ const STEPS = [
   { k: 'Engineer × storyteller', t: STORY.both },
 ]
 
-const GLANCE = [
-  { v: '30+', l: 'Brands scaled' },
-  { v: '0 → 1M+', l: 'Followers' },
-  { v: '4', l: 'Industries: AI · FinTech · EdTech · Politics' },
-]
 
 /** WHO AM I — the hero line, the story in four beats, where it started, the toolkit. */
 export function AboutPage() {

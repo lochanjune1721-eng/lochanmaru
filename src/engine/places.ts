@@ -57,6 +57,9 @@ export function openPage(id: PlaceId, section?: string) {
   if (wasOpen && wasOpen !== id) getDoor(wasOpen).force = false
   st.set({ page: id, pageSection: section ?? null, prompt: null, hoverPlace: null, helpOpen: false })
   st.markVisited(id)
+  // the name tags unmount without a pointer-leave, and a key that opened the page must not also "use" something
+  hoverTag.id = null
+  input.interact = false
   if (!wasOpen) {
     prevEnabled = input.enabled
     input.enabled = false
@@ -76,6 +79,8 @@ export function closePage() {
   if (!id) return
   // the section is kept until the sheet has slid away, so its content doesn't change under the exit animation
   st.set({ page: null })
+  hoverTag.id = null
+  input.interact = false
   input.enabled = prevEnabled
   setTimeout(() => {
     const now = store.getState()

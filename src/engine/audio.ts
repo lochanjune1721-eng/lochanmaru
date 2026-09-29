@@ -695,7 +695,7 @@ function init() {
       shot(voices.door)
       shot(voices.arrive, true)
     }
-    shot(voices.paper, kind === 'open')
+    shot(voices.paper, kind !== 'close') // opening, or moving to another chapter / case study
     control() // duck (or un-duck) right away instead of on the next tick
   })
   bus.on('use', () => shot(voices.pop))

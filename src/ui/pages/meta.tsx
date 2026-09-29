@@ -1,4 +1,5 @@
 import type { PlaceId } from '../../engine/store'
+import { readable } from './color'
 
 export interface PageMeta {
   id: PlaceId
@@ -11,15 +12,23 @@ export interface PageMeta {
   on: string
   /** pastel wash behind the page's hero */
   tint: string
+  /** background + text colour for small labels (tabs, name tags, chips): same hue, guaranteed readable */
+  chip: string
+  chipOn: string
 }
 
-export const PAGES: PageMeta[] = [
+const RAW = [
   { id: 'home', label: 'WHO AM I', name: 'Who am I', color: '#f2a33c', on: '#2b2438', tint: '#f6d9a2' },
   { id: 'experience', label: 'EXPERIENCE', name: 'Experience', color: '#2f9591', on: '#fff8ea', tint: '#bfe2d9' },
   { id: 'work', label: 'WORK', name: 'Work', color: '#e2493f', on: '#fff8ea', tint: '#f6c3b4' },
   { id: 'results', label: 'RESULTS', name: 'Results', color: '#3e4392', on: '#fff8ea', tint: '#cbd0f2' },
   { id: 'hire', label: 'HIRE LOCHAN', name: 'Hire Lochan', color: '#e2493f', on: '#fff8ea', tint: '#f6c3b4' },
-]
+] as const
+
+export const PAGES: PageMeta[] = RAW.map((p) => {
+  const r = readable(p.color)
+  return { ...p, chip: r.bg, chipOn: r.fg }
+})
 
 export const pageMeta = (id: PlaceId) => PAGES.find((p) => p.id === id)!
 

@@ -68,7 +68,7 @@ export function Pages() {
 
   // move focus into the page when it opens, and back out when it closes
   useEffect(() => {
-    if (open) dlg.current?.focus({ preventScroll: true })
+    if (open) scroller.current?.focus({ preventScroll: true })
     else if (returnTo.current && returnTo.current.isConnected && !useStore.getState().page) {
       returnTo.current.focus({ preventScroll: true })
       returnTo.current = null
@@ -79,11 +79,8 @@ export function Pages() {
     if (!page) return
     const onKey = (e: KeyboardEvent) => {
       const st = useStore.getState()
-      if (st.helpOpen || st.textOpen || typing(e.target) || e.metaKey || e.ctrlKey || e.altKey) return
-      if (e.code === 'Escape') {
-        if (st.pageSection && (st.page === 'work' || st.page === 'experience')) setSection(null)
-        else closePage()
-      } else if (e.code === 'ArrowRight' && !(e.target as HTMLElement | null)?.closest?.('iframe')) stepPage(1)
+      if (e.repeat || st.helpOpen || st.textOpen || typing(e.target) || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return
+      if (e.code === 'ArrowRight') stepPage(1)
       else if (e.code === 'ArrowLeft') stepPage(-1)
     }
     window.addEventListener('keydown', onKey)
@@ -112,6 +109,7 @@ export function Pages() {
         aria-label={tall ? 'Show less of the page' : 'Show more of the page'}
         aria-expanded={tall}
         onPointerDown={(e) => {
+          swiped.current = false
           swipe.current = { y: e.clientY }
           e.currentTarget.setPointerCapture(e.pointerId)
         }}
@@ -143,7 +141,7 @@ export function Pages() {
             <li key={p.id}>
               <button
                 className={`pg-tab ${p.id === shown ? 'on' : ''} ${visited[p.id] ? 'seen' : ''}`}
-                style={vars({ '--c': p.color, '--on': p.on })}
+                style={vars({ '--c': p.chip, '--on': p.chipOn })}
                 aria-current={p.id === page ? 'page' : undefined}
                 title={p.label}
                 onClick={() => (p.id === page ? setSection(null) : openPage(p.id))}
@@ -160,7 +158,7 @@ export function Pages() {
           </svg>
         </button>
       </nav>
-      <div className="pg-scroll" ref={scroller}>
+      <div className="pg-scroll" ref={scroller} tabIndex={-1}>
         <div className="pg-page" key={shown}>
           <Body />
         </div>

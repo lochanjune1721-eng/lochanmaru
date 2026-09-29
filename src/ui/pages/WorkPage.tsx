@@ -4,7 +4,8 @@ import { PROJECTS, Project, WINGS, Wing, projectById } from '../../content/proje
 import { setSection } from '../../engine/places'
 import { useStore } from '../../engine/store'
 import { BlockView } from '../Blocks'
-import { BackBar, Hero, NextUp, PrevNext, isLight, rv, vars } from './parts'
+import { readable } from './color'
+import { BackBar, Hero, NextUp, PrevNext, rv, vars } from './parts'
 
 type Filter = Wing | 'all'
 /** the filter survives opening a case study and coming back */
@@ -31,7 +32,7 @@ const ordered = (f: Filter) => {
 export function WorkPage() {
   const section = useStore((s) => s.pageSection)
   const project = section ? projectById(section) : undefined
-  return project ? <CaseStudy p={project} /> : <Wall />
+  return project ? <CaseStudy key={project.id} p={project} /> : <Wall />
 }
 
 function Logo({ p }: { p: Project }) {
@@ -54,7 +55,7 @@ function Wall() {
       <div className="pg-main">
         <div className="pg-filters rv" style={rv(1).style} role="tablist" aria-label="Filter the work">
           {([{ id: 'all', name: 'All', color: '#2b2438' }, ...WINGS] as { id: Filter; name: string; color: string }[]).map((w) => (
-            <button key={w.id} role="tab" aria-selected={f === w.id} className={f === w.id ? 'on' : ''} style={vars({ '--c': w.color, '--on': isLight(w.color) ? '#2b2438' : '#fff8ea' })} onClick={() => pick(w.id)}>
+            <button key={w.id} role="tab" aria-selected={f === w.id} className={f === w.id ? 'on' : ''} style={vars({ '--c': readable(w.color).bg, '--on': readable(w.color).fg })} onClick={() => pick(w.id)}>
               {w.name}
               <em>{count(w.id)}</em>
             </button>

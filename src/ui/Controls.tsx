@@ -15,7 +15,7 @@ export function Controls() {
   useEffect(() => {
     const el = layer.current!
     const R = 58
-    type P = { id: number; kind: 'look' | 'stick'; x: number; y: number; sx: number; sy: number; t0: number; moved: number }
+    type P = { id: number; kind: 'look' | 'stick'; x: number; y: number; sx: number; sy: number; t0: number; moved: number; shown?: boolean }
     const ptrs = new Map<number, P>()
 
     const showStick = (x: number, y: number) => {
@@ -42,8 +42,8 @@ export function Controls() {
       // the floating stick only exists while walking is allowed (not while a page is open)
       const kind: P['kind'] = touch && leftHalf && !hasStick && input.enabled ? 'stick' : 'look'
       ptrs.set(e.pointerId, { id: e.pointerId, kind, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t0: performance.now(), moved: 0 })
-      if (kind === 'stick') showStick(e.clientX, e.clientY)
-      else input.dragging = true
+      // (the stick is drawn once the finger has actually moved, so a quick tap doesn't flash it)
+      if (kind === 'look') input.dragging = true
     }
 
     const move = (e: PointerEvent) => {
@@ -61,6 +61,11 @@ export function Controls() {
       p.y = e.clientY
       p.moved += Math.abs(dx) + Math.abs(dy)
       if (p.kind === 'stick') {
+        if (!p.shown) {
+          if (p.moved < 6) return
+          p.shown = true
+          showStick(p.sx, p.sy)
+        }
         let vx = e.clientX - p.sx
         let vy = e.clientY - p.sy
         const l = Math.hypot(vx, vy)
@@ -95,6 +100,13 @@ export function Controls() {
       }
     }
 
+    const cancel = (e: PointerEvent) => {
+      const p = ptrs.get(e.pointerId)
+      if (!p) return
+      ptrs.delete(e.pointerId)
+      if (p.kind === 'stick') hideStick()
+      else if (![...ptrs.values()].some((q) => q.kind === 'look')) input.dragging = false
+    }
     const leave = () => {
       input.hoverX = -1
       input.hoverY = -1
@@ -108,7 +120,7 @@ export function Controls() {
     el.addEventListener('pointerdown', down)
     el.addEventListener('pointermove', move)
     el.addEventListener('pointerup', up)
-    el.addEventListener('pointercancel', up)
+    el.addEventListener('pointercancel', cancel)
     el.addEventListener('pointerleave', leave)
     el.addEventListener('wheel', wheel, { passive: false })
     el.addEventListener('contextmenu', ctx)
@@ -116,7 +128,7 @@ export function Controls() {
       el.removeEventListener('pointerdown', down)
       el.removeEventListener('pointermove', move)
       el.removeEventListener('pointerup', up)
-      el.removeEventListener('pointercancel', up)
+      el.removeEventListener('pointercancel', cancel)
       el.removeEventListener('pointerleave', leave)
       el.removeEventListener('wheel', wheel)
       el.removeEventListener('contextmenu', ctx)

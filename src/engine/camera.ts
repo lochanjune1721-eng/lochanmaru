@@ -142,8 +142,8 @@ function followPose(dt: number, pos: Vector3, look: Vector3, up: Vector3, hardSn
  */
 function placeTarget(p: Place, pos: Vector3, look: Vector3, up: Vector3) {
   const f = p.frame
-  const W = window.innerWidth
-  const H = window.innerHeight
+  const W = Math.max(1, window.innerWidth)
+  const H = Math.max(1, window.innerHeight)
   const bottom = sheetBottom()
   const aspect = W / H
   // the framing distances are designed for a 16:9 window with roughly half of it free; back off when the free part is

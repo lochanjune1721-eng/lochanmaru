@@ -70,15 +70,20 @@ const isTyping = (t: EventTarget | null) => {
   return !!el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)
 }
 
+const isControl = (t: EventTarget | null) => t instanceof HTMLElement && !!t.closest('button, a[href], summary, [role="button"], [role="tab"]')
+
 export function installKeyboard() {
   const down = (e: KeyboardEvent) => {
     if (isTyping(e.target)) return
     input.lastActivity = performance.now()
     if (e.code in MOVE_KEYS || e.code === 'Space') {
-      if (input.enabled) e.preventDefault()
+      // (but let Space / arrows work normally on a focused button, tab strip or scrolling page)
+      if (input.enabled && !isControl(e.target)) e.preventDefault()
     }
     if (!e.repeat) {
-      if (e.code === 'KeyE' || e.code === 'Enter' || e.code === 'Space') input.interact = true
+      // Enter / Space on a focused button or link activates *that* (a second action must not fire on whatever is near)
+      const activating = (e.code === 'Enter' || e.code === 'Space') && isControl(e.target)
+      if (e.code === 'KeyE' || ((e.code === 'Enter' || e.code === 'Space') && !activating)) input.interact = true
       if (e.code === 'Escape') input.cancel = true
     }
     input.keys.add(e.code)

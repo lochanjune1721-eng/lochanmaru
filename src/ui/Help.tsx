@@ -1,20 +1,11 @@
-import { useEffect } from 'react'
 import { useStore } from '../engine/store'
 
 export function Help() {
   const open = useStore((s) => s.helpOpen)
   const touch = useStore((s) => s.touch)
   const set = useStore((s) => s.set)
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.code === 'Escape') set({ helpOpen: false })
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, set])
   return (
-    <div className={`help ${open ? 'show' : ''}`} role="dialog" aria-label="Controls" aria-hidden={!open}>
+    <div className={`help ${open ? 'show' : ''}`} role="dialog" aria-label="Controls" aria-hidden={!open} inert={!open || undefined}>
       <h3>How to get around</h3>
       {touch ? (
         <dl>

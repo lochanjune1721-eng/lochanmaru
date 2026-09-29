@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { closePage, setSection } from '../engine/places'
 import { useStore } from '../engine/store'
 import { Fallback } from './Fallback'
 import { Help } from './Help'
@@ -16,15 +17,22 @@ export function Overlay() {
   const page = useStore((s) => s.page)
   const textOpen = useStore((s) => s.textOpen)
 
+  // Escape puts away one thing at a time, topmost first: the text version, the help card, a case study / chapter, the page.
+  // (capture phase, so nothing else reacts to the same key press)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.code === 'Escape') {
-        const st = useStore.getState()
-        if (st.textOpen) st.set({ textOpen: false })
-      }
+      if (e.code !== 'Escape') return
+      const st = useStore.getState()
+      if (st.textOpen) st.set({ textOpen: false })
+      else if (st.helpOpen) st.set({ helpOpen: false })
+      else if (st.page && !e.repeat) {
+        if (st.pageSection && (st.page === 'work' || st.page === 'experience')) setSection(null)
+        else closePage()
+      } else return
+      e.stopPropagation()
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
   }, [])
 
   return (
